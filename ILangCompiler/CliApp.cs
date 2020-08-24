@@ -1,15 +1,26 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CommandLine;
+using FunctionalExtensions;
+using ILangCompiler.Scanner;
+using ILangCompiler.Scanner.Tokens;
+using LanguageExt;
+
+// using ILangCompiler.Lexer;
 
 namespace ILangCompiler
 {
   public class CliApp
   {
-    // TODO: inject lexer and use it
+    private LexicalScanner Lexer { get; }
+
+    public CliApp(LexicalScanner lexicalScanner)
+    {
+      Lexer = lexicalScanner;
+    }
 
     public async Task Main(string[] args) =>
       await (await Parser.Default.ParseArguments<CliOptions>(args)
@@ -17,21 +28,36 @@ namespace ILangCompiler
         .WithNotParsedAsync(MainWithoutArgs)
       ;
 
-    private Task MainWithArgs(CliOptions options)
+    private async Task<Unit> MainWithArgs(CliOptions options)
     {
+      Task<Unit> resultEffect = Task.FromResult(Unit.Default);
+
+      // TODO: migrate effect to task
       if (File.Exists(options.FilePath))
       {
+        // TODO: migrate effect to task
         using var fileReader = new StreamReader(options.FilePath, Encoding.UTF8);
-        // TODO: use lexer
+        var tokens = Lexer.Tokenize(fileReader);
+
+        // TODO: add additional cli arguments to indicate the compilation result
+        // TODO: add additional cli arguments to indicate the output file
+        var tokensString = "[ " +
+          string.Join(
+            ", ",
+            await tokens.Select(t => $"\"{t.Lexeme.Replace("\n", @"\n")}\"").ToListAsync().AsTask()
+          ) + " ]"
+        ;
+
+        resultEffect =
+          FConsole.WriteLine(tokensString);
       }
       else
       {
-        return Task.Run(() =>
-          Console.WriteLine($"Error: there is no file {options.FilePath}")
-        );
+        resultEffect =
+          FConsole.WriteLine($"Error: there is no file {options.FilePath}");
       }
 
-      return Task.CompletedTask;
+      return await resultEffect;
     }
 
     private Task MainWithoutArgs(IEnumerable<Error> errors) =>

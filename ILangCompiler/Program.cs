@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using System.Threading.Tasks;
-using CommandLine;
+﻿using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using ILangCompiler.Scanner;
 
 namespace ILangCompiler
 {
@@ -21,9 +17,10 @@ namespace ILangCompiler
       return app.Main(args);
     }
 
-    private static void RegisterServices(ServiceCollection serviceCollection)
+    private static void RegisterServices(IServiceCollection serviceCollection)
     {
       // Register services for dependency injection here
+      serviceCollection.AddTransient<LexicalScanner>();
     }
   }
 }
