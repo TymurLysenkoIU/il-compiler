@@ -61,17 +61,18 @@ routine fillArray10 (arr: IntArr10) is
 	end
 end
 
-// Return the squares of reversed even numbers of IntArr10, so result becomes IntArr5: [100, 64, 36, 16, 4, 0]
+// Return the sum of squares of reversed even numbers of IntArr10, so result becomes integer: 100 + 64 + 36 + 16 + 4 = 220
 routine main () : IntArr5 is
 	van arr: IntArr10s
 	fillTheArray(arr)
 
-	var newArr: IntArr5
+	var sum: integer
 	for i in reverse 1..10 loop
 		var value is arr[i]
 		if (value % 2 = 0) then
-			newArr[(10 - i) / 2] := square(i)
+			sum := sum + square(i)
 		end
 	end
-	return newArr
+
+	return sum
 end
