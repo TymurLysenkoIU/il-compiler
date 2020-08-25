@@ -12,7 +12,12 @@ namespace ILangCompiler.Scanner
       // TODO: process source and return list of tokens
       while (!source.EndOfStream)
       {
-        yield return new CharToken((char) source.Read());
+        yield return new CharToken(
+          (char) source.Read(),
+          0,
+          0,
+          0
+          ); // TODO: keep track of numbers
       }
     }
   }

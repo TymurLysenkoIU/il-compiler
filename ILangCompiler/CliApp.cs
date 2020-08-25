@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using CommandLine;
 using FunctionalExtensions;
+using FunctionalExtensions.IO;
 using ILangCompiler.Scanner;
 using ILangCompiler.Scanner.Tokens;
 using LanguageExt;

@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using LanguageExt;
 
-namespace FunctionalExtensions
+namespace FunctionalExtensions.IO
 {
   public static class FConsole
   {
