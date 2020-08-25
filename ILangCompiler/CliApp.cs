@@ -4,10 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CommandLine;
-using FunctionalExtensions;
 using FunctionalExtensions.IO;
 using ILangCompiler.Scanner;
-using ILangCompiler.Scanner.Tokens;
 using LanguageExt;
 
 // using ILangCompiler.Lexer;
@@ -37,7 +35,7 @@ namespace ILangCompiler
       if (File.Exists(options.FilePath))
       {
         // TODO: migrate effect to task
-        using var fileReader = new StreamReader(options.FilePath, Encoding.UTF8);
+        using var fileReader = new SafeStreamReader(options.FilePath, Encoding.UTF8);
         var tokens = Lexer.Tokenize(fileReader);
 
         // TODO: add additional cli arguments to indicate the compilation result
@@ -45,7 +43,7 @@ namespace ILangCompiler
         var tokensString = "[ " +
           string.Join(
             ", ",
-            await tokens.Select(t => $"\"{t.Lexeme.Replace("\n", @"\n")}\"").ToListAsync().AsTask()
+            tokens.Select(t => $"({t.Lexeme}, {t.GetType().Name})")
           ) + " ]"
         ;
 

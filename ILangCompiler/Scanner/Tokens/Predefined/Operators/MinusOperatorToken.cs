@@ -2,7 +2,9 @@ namespace ILangCompiler.Scanner.Tokens.Predefined.Operators
 {
   public class MinusOperatorToken : OperatorToken
   {
-    public override string Lexeme => "-";
+    public const string LexemeValue = "-";
+
+    public override string Lexeme => LexemeValue;
 
     public MinusOperatorToken(
       uint absolutePosition,

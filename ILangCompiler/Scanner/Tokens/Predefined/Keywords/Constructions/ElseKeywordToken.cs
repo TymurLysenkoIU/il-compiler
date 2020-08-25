@@ -1,9 +1,10 @@
-
 namespace ILangCompiler.Scanner.Tokens.Predefined.Keywords.Constructions
 {
   public class ElseKeywordToken : KeywordToken
   {
-    public override string Lexeme => "else";
+    public const string LexemeValue = "else";
+
+    public override string Lexeme => LexemeValue;
 
     public ElseKeywordToken(
       uint absolutePosition,

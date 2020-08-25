@@ -3,7 +3,9 @@ namespace ILangCompiler.Scanner.Tokens.Predefined.Keywords.PrimitiveTypes
 {
   public class IntegerKeywordToken : KeywordToken
   {
-    public override string Lexeme => "integer";
+    public const string LexemeValue = "integer";
+
+    public override string Lexeme => LexemeValue;
 
     public IntegerKeywordToken(
       uint absolutePosition,

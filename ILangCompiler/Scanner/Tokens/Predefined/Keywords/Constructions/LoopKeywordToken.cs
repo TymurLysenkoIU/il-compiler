@@ -1,9 +1,10 @@
-
 namespace ILangCompiler.Scanner.Tokens.Predefined.Keywords.Constructions
 {
   public class LoopKeywordToken : KeywordToken
   {
-    public override string Lexeme => "loop";
+    public const string LexemeValue = "loop";
+
+    public override string Lexeme => LexemeValue;
 
     public LoopKeywordToken(
       uint absolutePosition,

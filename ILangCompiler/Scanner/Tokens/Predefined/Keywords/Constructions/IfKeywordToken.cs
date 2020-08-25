@@ -1,9 +1,10 @@
-
 namespace ILangCompiler.Scanner.Tokens.Predefined.Keywords.Constructions
 {
   public class IfKeywordToken : KeywordToken
   {
-    public override string Lexeme => "if";
+    public const string LexemeValue = "if";
+
+    public override string Lexeme => LexemeValue;
 
     public IfKeywordToken(
       uint absolutePosition,

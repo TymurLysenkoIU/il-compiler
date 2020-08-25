@@ -2,7 +2,9 @@ namespace ILangCompiler.Scanner.Tokens.Predefined.Keywords
 {
   public class FalseKeywordToken : KeywordToken
   {
-    public override string Lexeme => "false";
+    public const string LexemeValue = "false";
+
+    public override string Lexeme => LexemeValue;
 
     public FalseKeywordToken(
       uint absolutePosition,

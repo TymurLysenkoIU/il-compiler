@@ -2,7 +2,9 @@ namespace ILangCompiler.Scanner.Tokens.Predefined.Symbols
 {
   public class RightBracketSymbolToken : SymbolToken
   {
-    public override string Lexeme => "]";
+    public const string LexemeValue = "]";
+
+    public override string Lexeme => LexemeValue;
 
     public RightBracketSymbolToken(
       uint absolutePosition,

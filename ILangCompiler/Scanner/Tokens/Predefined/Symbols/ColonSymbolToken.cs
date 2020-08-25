@@ -2,7 +2,9 @@ namespace ILangCompiler.Scanner.Tokens.Predefined.Symbols
 {
   public class ColonSymbolToken : SymbolToken
   {
-    public override string Lexeme => ":";
+    public const string LexemeValue = ":";
+
+    public override string Lexeme => LexemeValue;
 
     public ColonSymbolToken(
       uint absolutePosition,

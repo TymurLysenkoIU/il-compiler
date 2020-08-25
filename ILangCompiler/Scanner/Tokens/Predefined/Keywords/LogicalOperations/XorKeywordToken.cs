@@ -3,7 +3,9 @@ namespace ILangCompiler.Scanner.Tokens.Predefined.Keywords.LogicalOperations
 {
   public class XorKeywordToken : KeywordToken
   {
-    public override string Lexeme => "xor";
+    public const string LexemeValue = "xor";
+
+    public override string Lexeme => LexemeValue;
 
     public XorKeywordToken(
       uint absolutePosition,

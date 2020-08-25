@@ -2,7 +2,9 @@ namespace ILangCompiler.Scanner.Tokens.Predefined.Keywords.Declaration
 {
   public class VarKeywordToken : KeywordToken
   {
-    public override string Lexeme => "var";
+    public const string LexemeValue = "var";
+
+    public override string Lexeme => LexemeValue;
 
     public VarKeywordToken(
       uint absolutePosition,

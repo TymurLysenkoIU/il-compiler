@@ -1,9 +1,10 @@
-
 namespace ILangCompiler.Scanner.Tokens.Predefined.Keywords.Constructions
 {
   public class ThenKeywordToken : KeywordToken
   {
-    public override string Lexeme => "then";
+    public const string LexemeValue = "then";
+
+    public override string Lexeme => LexemeValue;
 
     public ThenKeywordToken(
       uint absolutePosition,

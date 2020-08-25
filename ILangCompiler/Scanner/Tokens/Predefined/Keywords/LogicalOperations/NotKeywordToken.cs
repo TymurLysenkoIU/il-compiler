@@ -2,7 +2,9 @@ namespace ILangCompiler.Scanner.Tokens.Predefined.Keywords.LogicalOperations
 {
   public class NotKeywordToken : KeywordToken
   {
-    public override string Lexeme => "not";
+    public const string LexemeValue = "not";
+
+    public override string Lexeme => LexemeValue;
 
     public NotKeywordToken(
       uint absolutePosition,

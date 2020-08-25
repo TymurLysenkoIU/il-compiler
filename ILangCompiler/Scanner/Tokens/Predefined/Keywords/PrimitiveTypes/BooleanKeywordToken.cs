@@ -3,7 +3,9 @@ namespace ILangCompiler.Scanner.Tokens.Predefined.Keywords.PrimitiveTypes
 {
   public class BooleanKeywordToken : KeywordToken
   {
-    public override string Lexeme => "boolean";
+    public const string LexemeValue = "boolean";
+
+    public override string Lexeme => LexemeValue;
 
     public BooleanKeywordToken(
       uint absolutePosition,

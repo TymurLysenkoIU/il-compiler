@@ -3,7 +3,9 @@ namespace ILangCompiler.Scanner.Tokens.Predefined.Keywords
 {
   public class InKeywordToken : KeywordToken
   {
-    public override string Lexeme => "in";
+    public const string LexemeValue = "in";
+
+    public override string Lexeme => LexemeValue;
 
     public InKeywordToken(
       uint absolutePosition,

@@ -2,7 +2,9 @@ namespace ILangCompiler.Scanner.Tokens.Predefined.Operators
 {
   public class LeOperatorToken : OperatorToken
   {
-    public override string Lexeme => "<=";
+    public const string LexemeValue = "<=";
+
+    public override string Lexeme => LexemeValue;
 
     public LeOperatorToken(
       uint absolutePosition,

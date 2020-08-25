@@ -2,7 +2,9 @@ namespace ILangCompiler.Scanner.Tokens.Predefined.Keywords.Declaration
 {
   public class ArrayKeywordToken : KeywordToken
   {
-    public override string Lexeme => "array";
+    public const string LexemeValue = "array";
+
+    public override string Lexeme => LexemeValue;
 
     public ArrayKeywordToken(
       uint absolutePosition,

@@ -3,7 +3,9 @@ namespace ILangCompiler.Scanner.Tokens.Predefined.Keywords.LogicalOperations
 {
   public class OrKeywordToken : KeywordToken
   {
-    public override string Lexeme => "or";
+    public const string LexemeValue = "or";
+
+    public override string Lexeme => LexemeValue;
 
     public OrKeywordToken(
       uint absolutePosition,

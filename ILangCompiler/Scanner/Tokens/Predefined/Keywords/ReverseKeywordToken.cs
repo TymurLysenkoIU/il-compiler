@@ -2,7 +2,9 @@ namespace ILangCompiler.Scanner.Tokens.Predefined.Keywords
 {
   public class ReverseKeywordToken : KeywordToken
   {
-    public override string Lexeme => "reverse";
+    public const string LexemeValue = "reverse";
+
+    public override string Lexeme => LexemeValue;
 
     public ReverseKeywordToken(
       uint absolutePosition,

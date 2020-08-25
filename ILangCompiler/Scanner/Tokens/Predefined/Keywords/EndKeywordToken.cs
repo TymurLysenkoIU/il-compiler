@@ -2,7 +2,9 @@ namespace ILangCompiler.Scanner.Tokens.Predefined.Keywords
 {
   public class EndKeywordToken : KeywordToken
   {
-    public override string Lexeme => "end";
+    public const string LexemeValue = "end";
+
+    public override string Lexeme => LexemeValue;
 
     public EndKeywordToken(
       uint absolutePosition,

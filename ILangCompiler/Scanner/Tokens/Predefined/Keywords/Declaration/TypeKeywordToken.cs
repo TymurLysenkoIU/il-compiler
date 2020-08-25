@@ -2,7 +2,9 @@ namespace ILangCompiler.Scanner.Tokens.Predefined.Keywords.Declaration
 {
   public class TypeKeywordToken : KeywordToken
   {
-    public override string Lexeme => "type";
+    public const string LexemeValue = "type";
+
+    public override string Lexeme => LexemeValue;
 
     public TypeKeywordToken(
       uint absolutePosition,
