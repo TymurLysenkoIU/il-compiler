@@ -5,9 +5,14 @@ routine FirstRoutine() is
 	var ThirdIdentifier is 1
 	var FourthIdentifier is 0
 
-	var FifthIdentifier := ThirdIdentifier * 5
-	var SixthIdentifier := ThirdIdentifier * FourthIdentifier
-	var SeventhIdentifier := FirstIdentifier and SecondIdentifier
-	var EigthIdentifier := FirstIdentifier xor SecondIdentifier
+	var FifthIdentifier : integer
+	var SixthIdentifier : integer
+	var SeventhIdentifier : boolean
+	var EigthIdentifier : boolean
+
+	FifthIdentifier := ThirdIdentifier * 5
+	SixthIdentifier := ThirdIdentifier * FourthIdentifier
+	SeventhIdentifier := FirstIdentifier and SecondIdentifier
+	EigthIdentifier := FirstIdentifier xor SecondIdentifier
 
 end

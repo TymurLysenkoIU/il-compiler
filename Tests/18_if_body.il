@@ -4,18 +4,18 @@ routine FirstRoutine() is
 	var SecondIdentifier is flase
 
 	if FirstIdentifier = true then
-		var ThirdIdentifier := 1
+		var ThirdIdentifier is 1
 		ThirdIdentifier := ThirdIdentifier * 5
 	else
-		var ThirdIdentifier := 2
+		var ThirdIdentifier is 2
 		ThirdIdentifier := ThirdIdentifier * 3
 	end
 
 	if SecondIdentifier = false then
-		var FourthIdentifier := 1
+		var FourthIdentifier is 1
 		FourthIdentifier := ThirdIdentifier * 5
 	else
-		var FourthIdentifier := 2
+		var FourthIdentifier is 2
 		FourthIdentifier := ThirdIdentifier * 3
 	end
 

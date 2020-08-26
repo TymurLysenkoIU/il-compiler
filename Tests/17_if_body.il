@@ -5,15 +5,15 @@ routine FirstRoutine() is
 
 
 	if FirstIdentifier = true then
-		var ThirdIdentifier := 1
+		var ThirdIdentifier is 1
 	else
-		var ThirdIdentifier := 2
+		var ThirdIdentifier is 1
 	end
 
 	if SecondIdentifier = false then
-		var FourthIdentifier := 1
+		var FourthIdentifier is 1
 	else
-		var FourthIdentifier := 2
+		var FourthIdentifier is 2
 	end
 
 end 
