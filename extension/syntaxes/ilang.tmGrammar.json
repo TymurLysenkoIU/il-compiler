@@ -2,43 +2,57 @@
 	"scopeName": "source.ilang",
 	"patterns": [
 		{
-			"include": "#expression"
-		}
-	],
-	"repository": {
-		"expression": {
-			"patterns": [
-				{
-					"include": "#letter"
+			"match": "\\b(?i:(var|type|is|end|integer|real|boolean|true|false|record|array|while|for|loop|return|in|reverse|if|then|else))\\b",
+			"name": "keyword.control.pascal"
+		},
+		{
+			"captures": {
+				"1": {
+					"name": "storage.type.prototype.pascal"
 				},
-				{
-					"include": "#paren-expression"
+				"2": {
+					"name": "entity.name.function.prototype.pascal"
 				}
-			]
+			},
+			"match": "\\b(?i:(routine))\\b\\s+(\\w+(\\.\\w+)?)(\\(.*?\\))?;\\s*(?=(?i:attribute|forward|external))",
+			"name": "meta.function.prototype.pascal"
 		},
-		"letter": {
-			"match": "a|b|c",
-			"name": "keyword.letter"
+		{
+			"captures": {
+				"1": {
+					"name": "storage.type.function.pascal"
+				},
+				"2": {
+					"name": "entity.name.function.pascal"
+				}
+			},
+			"match": "\\b(?i:(routine))\\b\\s+(\\w+(\\.\\w+)?)",
+			"name": "meta.function.pascal"
 		},
-		"paren-expression": {
-			"begin": "\\(",
-			"end": "\\)",
+		{
+			"match": "\\b((0(x|X)[0-9a-fA-F]*)|(([0-9]+\\.?[0-9]*)|(\\.[0-9]+))((e|E)(\\+|-)?[0-9]+)?)(L|l|UL|ul|u|U|F|f|ll|LL|ull|ULL)?\\b",
+			"name": "constant.numeric.pascal"
+		},
+		{
+			"begin": "(^[ \\t]+)?(?=//)",
 			"beginCaptures": {
-				"0": {
-					"name": "punctuation.paren.open"
+				"1": {
+					"name": "punctuation.whitespace.comment.leading.pascal"
 				}
 			},
-			"endCaptures": {
-				"0": {
-					"name": "punctuation.paren.close"
-				}
-			},
-			"name": "expression.group",
+			"end": "(?!\\G)",
 			"patterns": [
 				{
-					"include": "#expression"
+					"begin": "//",
+					"beginCaptures": {
+						"0": {
+							"name": "punctuation.definition.comment.pascal"
+						}
+					},
+					"end": "\\n",
+					"name": "comment.line.double-slash.pascal.two"
 				}
 			]
 		}
-	}
+	]
 }
