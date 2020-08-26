@@ -3,5 +3,5 @@ routine SecondRoutine( FirstArgument : integer) : integer is
 end
 
 routine FirstRoutine() is 
-	FirstIdentifier := SecondRoutine( 10 )
+	var FirstIdentifier := SecondRoutine( 10 )
 end
