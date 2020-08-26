@@ -1,0 +1,8 @@
+out
+node_modules
+client/server
+
+client/node_modules
+client/out
+server/node_modules
+server/out
