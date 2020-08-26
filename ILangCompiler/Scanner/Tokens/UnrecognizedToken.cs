@@ -1,3 +1,5 @@
+using LanguageExt;
+
 namespace ILangCompiler.Scanner.Tokens
 {
   public class UnrecognizedToken : IToken
@@ -14,5 +16,20 @@ namespace ILangCompiler.Scanner.Tokens
       LineNumber = lineNumber;
       PositionInLine = positionInLine;
     }
+
+    public static Option<IToken> FromString(
+      string s,
+      uint absolutePosition,
+      uint lineNumber,
+      uint positionInLine
+    ) =>
+      string.IsNullOrEmpty(s)
+        ? Option<IToken>.None
+        : new UnrecognizedToken(
+            s,
+            absolutePosition,
+            lineNumber,
+            positionInLine
+          );
   }
 }

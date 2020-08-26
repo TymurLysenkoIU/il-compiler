@@ -40,11 +40,22 @@ namespace ILangCompiler
 
         // TODO: add additional cli arguments to indicate the compilation result
         // TODO: add additional cli arguments to indicate the output file
-        var tokensString = "[ " +
+        var tokensString =
           string.Join(
-            ", ",
-            tokens.Select(t => $"({t.Lexeme}, {t.GetType().Name})")
-          ) + " ]"
+            "\n",
+            tokens.Select(t =>
+              string.Join(", ",
+                new []
+                {
+                  "Lexeme: " + (t.Lexeme == "\n" ? @"\n" : t.Lexeme),
+                  $"Token: {t.GetType().Name}",
+                  // $"Absolute position: {t.AbsolutePosition}", // Broken for now
+                  $"Line number: {t.LineNumber}",
+                  $"Position in line: {t.PositionInLine}",
+                }
+              )
+            )
+          )
         ;
 
         resultEffect =
