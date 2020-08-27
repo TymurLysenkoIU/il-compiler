@@ -1,43 +1,79 @@
 {
 	"scopeName": "source.ilang",
 	"patterns": [
-		{
-			"match": "\\b(?i:(var|type|is|end|integer|real|boolean|true|false|record|array|while|for|loop|return|in|reverse|if|then|else))\\b",
-			"name": "keyword.control.pascal"
+		{ "include": "#keywords" },
+		{ "include": "#primitives" },
+		{ "include": "#functions" },
+		{ "include": "#types" },
+		{ "include": "#variables" },
+		{ "include": "#numbers" },
+		{ "include": "#comments" }
+	],
+	"repository": {
+		"keywords": {
+			"match": "\\b(?i:(is|end|while|for|loop|return|in|reverse|if|then|else))\\b",
+			"name": "keyword.control.ilang"
 		},
-		{
+
+		"primitives": {
+			"match": "\\b(?i:(boolean|integer|real|true|false|record|array))\\b",
+			"name": "support.type.primitive"
+		},
+
+		"functions": {
 			"captures": {
 				"1": {
-					"name": "storage.type.prototype.pascal"
+					"name": "storage.type.function.ilang"
 				},
 				"2": {
-					"name": "entity.name.function.prototype.pascal"
-				}
-			},
-			"match": "\\b(?i:(routine))\\b\\s+(\\w+(\\.\\w+)?)(\\(.*?\\))?;\\s*(?=(?i:attribute|forward|external))",
-			"name": "meta.function.prototype.pascal"
-		},
-		{
-			"captures": {
-				"1": {
-					"name": "storage.type.function.pascal"
-				},
-				"2": {
-					"name": "entity.name.function.pascal"
+					"name": "entity.name.function.ilang"
 				}
 			},
 			"match": "\\b(?i:(routine))\\b\\s+(\\w+(\\.\\w+)?)",
-			"name": "meta.function.pascal"
+			"patterns": [
+				{
+					"match": "\\b(?i:(age|zumba))\\b",
+					"name": "variable.object.property.ilang"
+				}
+			]
 		},
-		{
+
+		"types": {
+			"captures": {
+				"1": {
+					"name": "storage.type.def.ilang"
+				},
+				"2": {
+					"name": "entity.name.type.interface.ilang"
+				}
+			},
+			"match": "\\b(?i:(type))\\b\\s+(\\w+(\\.\\w+)?)",
+			"name": "meta.type.ilang"
+		},
+
+		"variables": {
+			"captures": {
+				"1": {
+					"name": "keyword.control.ilang"
+				},
+				"2": {
+					"name": "meta.definition.variable.name.ilang"
+				}
+			},
+			"match": "\\b(?i:(var))\\b\\s+(\\w+(\\.\\w+)?)",
+			"name": "meta.type.ilang"
+		},
+
+		"numbers": {
 			"match": "\\b((0(x|X)[0-9a-fA-F]*)|(([0-9]+\\.?[0-9]*)|(\\.[0-9]+))((e|E)(\\+|-)?[0-9]+)?)(L|l|UL|ul|u|U|F|f|ll|LL|ull|ULL)?\\b",
-			"name": "constant.numeric.pascal"
+			"name": "constant.numeric.ilang"
 		},
-		{
+
+		"comments": {
 			"begin": "(^[ \\t]+)?(?=//)",
 			"beginCaptures": {
 				"1": {
-					"name": "punctuation.whitespace.comment.leading.pascal"
+					"name": "punctuation.whitespace.comment.leading.ilang"
 				}
 			},
 			"end": "(?!\\G)",
@@ -46,13 +82,13 @@
 					"begin": "//",
 					"beginCaptures": {
 						"0": {
-							"name": "punctuation.definition.comment.pascal"
+							"name": "punctuation.definition.comment.ilang"
 						}
 					},
 					"end": "\\n",
-					"name": "comment.line.double-slash.pascal.two"
+					"name": "comment.line.double-slash.ilang.two"
 				}
 			]
 		}
-	]
+	}
 }
