@@ -89,6 +89,9 @@ namespace ILangCompiler.Scanner
                 lexemeStartPositionInLine = 1;
 
                 break;
+              default:
+                lexemeStartPositionInLine += 1;
+                break;
             }
             absolutePosition = source.BaseStream.Position;
 
