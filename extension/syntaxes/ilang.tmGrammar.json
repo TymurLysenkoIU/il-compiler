@@ -1,0 +1,131 @@
+{
+	"scopeName": "source.ilang",
+	"patterns": [
+		{ "include": "#keywords" },
+		{ "include": "#primitives" },
+		{ "include": "#functions" },
+		{ "include": "#singleFunction" },
+		{ "include": "#singleType" },
+		{ "include": "#types" },
+		{ "include": "#array" },
+		{ "include": "#variables" },
+		{ "include": "#numbers" },
+		{ "include": "#comments" },
+		{ "include": "#property" }
+	],
+	"repository": {
+		"keywords": {
+			"match": "\\b(?i:(is|end|while|for|loop|return|in|reverse|if|then|else))\\b",
+			"name": "keyword.control.ilang"
+		},
+
+		"primitives": {
+			"match": "\\b(?i:(boolean|integer|real|true|false|record|array))\\b",
+			"name": "support.type.primitive"
+		},
+
+		"functions": {
+			"captures": {
+				"1": {
+					"name": "storage.type.function.ilang"
+				},
+				"2": {
+					"name": "entity.name.function.ilang"
+				},
+				"3": {
+					"name": "entity.name.type.interface.ilang"
+				}
+			},
+			"zima": "(?:\\s*\\([^:)]*:\\s*(\\w+)\\))?",
+			"match": "\\b(?i:(routine))\\b\\s+(\\w+(\\.\\w+)?)"
+		},
+
+		"singleFunction": {
+			"captures": {
+				"1": {
+					"name": "entity.name.function.ilang"
+				}
+			},
+			"match": "\\.?(\\w+)\\s*\\([^)]*\\)"
+		},
+
+		"singleType": {
+			"captures": {
+				"1": {
+					"name": "entity.name.type.interface.ilang"
+				}
+			},
+			"match": ":\\s*(\\w+)"
+		},
+
+		"property": {
+			"captures": {
+				"1": {
+					"name": "variable.other.property.ilang"
+				}
+			},
+			"match": "\\.([a-zA-Z]\\w*)"
+		},
+
+		"array": {
+			"captures": {
+				"1": {
+					"name": "variable.other.property.ilang"
+				}
+			},
+			"match": "(\\w+)\\[\\w*\\]"
+		},
+
+		"types": {
+			"captures": {
+				"1": {
+					"name": "storage.type.def.ilang"
+				},
+				"2": {
+					"name": "entity.name.type.interface.ilang"
+				}
+			},
+			"match": "\\b(?i:(type))\\b\\s+(\\w+(\\.\\w+)?)",
+			"name": "meta.type.ilang"
+		},
+
+		"variables": {
+			"captures": {
+				"1": {
+					"name": "keyword.control.ilang"
+				},
+				"2": {
+					"name": "meta.definition.variable.name.ilang"
+				}
+			},
+			"match": "\\b(?i:(var))\\b\\s+(\\w+(\\.\\w+)?)"
+		},
+
+		"numbers": {
+			"match": "\\b((0(x|X)[0-9a-fA-F]*)|(([0-9]+\\.?[0-9]*)|(\\.[0-9]+))((e|E)(\\+|-)?[0-9]+)?)(L|l|UL|ul|u|U|F|f|ll|LL|ull|ULL)?\\b",
+			"name": "constant.numeric.ilang"
+		},
+
+		"comments": {
+			"begin": "(^[ \\t]+)?(?=//)",
+			"beginCaptures": {
+				"1": {
+					"name": "punctuation.whitespace.comment.leading.ilang"
+				}
+			},
+			"end": "(?!\\G)",
+			"patterns": [
+				{
+					"begin": "//",
+					"beginCaptures": {
+						"0": {
+							"name": "punctuation.definition.comment.ilang"
+						}
+					},
+					"end": "\\n",
+					"name": "comment.line.double-slash.ilang.two"
+				}
+			]
+		}
+	}
+}

@@ -1,0 +1,11 @@
+.DS_Store
+.idea
+out
+node_modules
+client/server
+ilang**.vsix
+
+client/node_modules
+client/out
+server/node_modules
+server/out
