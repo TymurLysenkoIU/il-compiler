@@ -3,6 +3,7 @@
 out
 node_modules
 client/server
+ilang**.vsix
 
 client/node_modules
 client/out

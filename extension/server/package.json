@@ -1,6 +1,6 @@
 {
-	"name": "ilang-lsp",
-	"description": "Server part of the ilang lsp",
+	"name": "ilang",
+	"description": "LSP Server of the ilang",
 	"author": "VanishMax",
 	"license": "MIT",
 	"version": "0.0.1",

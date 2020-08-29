@@ -1,6 +1,6 @@
 {
-	"name": "ilang-lsp",
-	"description": "VScode extension for ilang",
+	"name": "ilang",
+	"description": "LSP client for ilang",
 	"author": "VanishMax",
 	"license": "MIT",
 	"version": "0.0.1",
