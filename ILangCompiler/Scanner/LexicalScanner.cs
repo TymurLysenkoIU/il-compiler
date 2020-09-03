@@ -144,6 +144,7 @@ namespace ILangCompiler.Scanner
                         .ToImmutableList()
                         .Add(tokenToAdd);
                       source.Read();
+                      currentLexemeBuffer.Clear();
                       lexemeStartPositionInLine += maybeBeforeToken
                         .Some(t => (uint) t.Lexeme.Length)
                         .None(0u) + (uint) (tokenToAdd?.Lexeme.Length ?? 0);
@@ -161,7 +162,7 @@ namespace ILangCompiler.Scanner
                       result = maybeBeforeToken
                         .ToImmutableList()
                         .Add(tokenToAdd);
-                      source.Read();
+                      currentLexemeBuffer.Clear();
                       lexemeStartPositionInLine += maybeBeforeToken
                         .Some(t => (uint) t.Lexeme.Length)
                         .None(0u) + (uint) (tokenToAdd?.Lexeme.Length ?? 0);
@@ -181,7 +182,7 @@ namespace ILangCompiler.Scanner
                   var result = maybeBeforeToken
                     .ToImmutableList()
                     .Add(tokenToAdd);
-                  source.Read();
+                  currentLexemeBuffer.Clear();
                   lexemeStartPositionInLine += maybeBeforeToken
                     .Some(t => (uint) t.Lexeme.Length)
                     .None(0u) + (uint) (tokenToAdd?.Lexeme.Length ?? 0);
