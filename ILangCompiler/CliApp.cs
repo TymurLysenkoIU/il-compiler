@@ -8,8 +8,6 @@ using FunctionalExtensions.IO;
 using ILangCompiler.Scanner;
 using LanguageExt;
 
-// using ILangCompiler.Lexer;
-
 namespace ILangCompiler
 {
   public class CliApp

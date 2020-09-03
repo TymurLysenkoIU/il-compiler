@@ -19,11 +19,10 @@ namespace ILangCompiler.Scanner
     {
       uint lineNumber = 1;
       uint lexemeStartPositionInLine = 1;
+      uint absolutePosition = 1;
       var maybeCurrentChar = Option<int>.None;
 
       var currentLexemeBuffer = new StringBuilder();
-      // TODO: fix this
-      var absolutePosition = source.BaseStream.Position;
 
       var maybeToken = Option<IToken>.None;;
 
@@ -41,7 +40,7 @@ namespace ILangCompiler.Scanner
 
             maybeToken = FlushBuffer(
               currentLexemeBuffer,
-              (uint) absolutePosition,
+              ref absolutePosition,
               lineNumber,
               ref lexemeStartPositionInLine
             );
@@ -55,45 +54,47 @@ namespace ILangCompiler.Scanner
                   .Some<IToken>(cn =>
                     cn == '\n' ?
                       (IToken) new NewLineSymbolToken(
-                        (uint) absolutePosition,
+                        absolutePosition,
                         lineNumber,
                         lexemeStartPositionInLine
                       ) :
                       (IToken) new UnrecognizedToken(
                         $"\r{cn}",
-                        (uint) absolutePosition,
+                        absolutePosition,
                         lineNumber,
                         lexemeStartPositionInLine
                       )
                   )
                   .None(new UnrecognizedToken(
                     $"\r",
-                    (uint) absolutePosition,
+                    absolutePosition,
                     lineNumber,
                     lexemeStartPositionInLine
                   ))
                 ;
 
+                absolutePosition += 2;
                 lineNumber += 1;
                 lexemeStartPositionInLine = 1;
 
                 break;
               case '\n':
                 yield return new NewLineSymbolToken(
-                  (uint) absolutePosition,
+                  absolutePosition,
                   lineNumber,
                   lexemeStartPositionInLine
                 );
 
+                absolutePosition += 1;
                 lineNumber += 1;
                 lexemeStartPositionInLine = 1;
 
                 break;
               default:
+                absolutePosition += 1;
                 lexemeStartPositionInLine += 1;
                 break;
             }
-            absolutePosition = source.BaseStream.Position;
 
             break;
 
@@ -103,19 +104,19 @@ namespace ILangCompiler.Scanner
             var maybeBeforeToken =
               IntegerLiteralToken.FromString(
                 currentLexeme,
-                (uint) absolutePosition,
+                absolutePosition,
                 lineNumber,
                 lexemeStartPositionInLine
               ) ||
               IdentifierToken.FromString(
                 currentLexeme,
-                (uint) absolutePosition,
+                absolutePosition,
                 lineNumber,
                 lexemeStartPositionInLine
               ) ||
               UnrecognizedToken.FromString(
                 currentLexeme,
-                (uint) absolutePosition,
+                absolutePosition,
                 lineNumber,
                 lexemeStartPositionInLine
               )
@@ -134,8 +135,15 @@ namespace ILangCompiler.Scanner
                       currentLexemeBuffer.Append('.');
                       return ImmutableList<IToken>.Empty;
                     case '.':
+                      absolutePosition += maybeBeforeToken
+                        .Map(t => (uint) t.Lexeme.Length)
+                        .IfNone(0);
+                      lexemeStartPositionInLine += maybeBeforeToken
+                        .Some(t => (uint) t.Lexeme.Length)
+                        .None(0u);
+
                       tokenToAdd = new RangeSymbolToken(
-                        (uint) absolutePosition,
+                        absolutePosition,
                         lineNumber,
                         lexemeStartPositionInLine
                       );
@@ -145,16 +153,21 @@ namespace ILangCompiler.Scanner
                         .Add(tokenToAdd);
                       source.Read();
                       currentLexemeBuffer.Clear();
-                      lexemeStartPositionInLine += maybeBeforeToken
-                        .Some(t => (uint) t.Lexeme.Length)
-                        .None(0u) + (uint) (tokenToAdd?.Lexeme.Length ?? 0);
-                      absolutePosition = source.BaseStream.Position;
+                      lexemeStartPositionInLine += (uint) (tokenToAdd?.Lexeme.Length ?? 0);
+                      absolutePosition += (uint) (tokenToAdd?.Lexeme.Length ?? 0);
 
                       return result;
 
                     default:
+                      absolutePosition += maybeBeforeToken
+                        .Map(t => (uint) t.Lexeme.Length)
+                        .IfNone(0);
+                      lexemeStartPositionInLine += maybeBeforeToken
+                        .Some(t => (uint) t.Lexeme.Length)
+                        .None(0u);
+
                       tokenToAdd = new DotSymbolToken(
-                        (uint) absolutePosition,
+                        absolutePosition,
                         lineNumber,
                         lexemeStartPositionInLine
                       );
@@ -163,18 +176,23 @@ namespace ILangCompiler.Scanner
                         .ToImmutableList()
                         .Add(tokenToAdd);
                       currentLexemeBuffer.Clear();
-                      lexemeStartPositionInLine += maybeBeforeToken
-                        .Some(t => (uint) t.Lexeme.Length)
-                        .None(0u) + (uint) (tokenToAdd?.Lexeme.Length ?? 0);
-                      absolutePosition = source.BaseStream.Position;
+                      lexemeStartPositionInLine += (uint) (tokenToAdd?.Lexeme.Length ?? 0);
+                      absolutePosition += (uint) (tokenToAdd?.Lexeme.Length ?? 0);
 
                       return result;
                   }
                 })
                 .None(() =>
                 {
+                  absolutePosition += maybeBeforeToken
+                    .Map(t => (uint) t.Lexeme.Length)
+                    .IfNone(0);
+                  lexemeStartPositionInLine += maybeBeforeToken
+                    .Some(t => (uint) t.Lexeme.Length)
+                    .None(0u);
+
                   var tokenToAdd = new DotSymbolToken(
-                    (uint) absolutePosition,
+                    absolutePosition,
                     lineNumber,
                     lexemeStartPositionInLine
                   );
@@ -183,10 +201,8 @@ namespace ILangCompiler.Scanner
                     .ToImmutableList()
                     .Add(tokenToAdd);
                   currentLexemeBuffer.Clear();
-                  lexemeStartPositionInLine += maybeBeforeToken
-                    .Some(t => (uint) t.Lexeme.Length)
-                    .None(0u) + (uint) (tokenToAdd?.Lexeme.Length ?? 0);
-                  absolutePosition = source.BaseStream.Position;
+                  lexemeStartPositionInLine += (uint) (tokenToAdd?.Lexeme.Length ?? 0);
+                  absolutePosition += (uint) (tokenToAdd?.Lexeme.Length ?? 0);
 
                   return result;
                 })
@@ -202,26 +218,27 @@ namespace ILangCompiler.Scanner
           case '/':
             maybeToken = FlushBuffer(
               currentLexemeBuffer,
-              (uint) absolutePosition,
+              ref absolutePosition,
               lineNumber,
               ref lexemeStartPositionInLine
             );
             if (maybeToken.IsSome)
               yield return maybeToken.ValueUnsafe();
-            absolutePosition = source.BaseStream.Position;
 
             yield return source.Peek()
               .Filter(c => c == '/')
               .Some<IToken>(c =>
               {
+                var commentContent = source.ReadLine();
+
                 var result = new CommentToken(
-                  $"//{source.ReadLine()}",
-                  (uint) absolutePosition,
+                  $"/{commentContent}",
+                  absolutePosition,
                   lineNumber,
                   lexemeStartPositionInLine
                 );
 
-                absolutePosition = source.BaseStream.Position;
+                absolutePosition += (uint) commentContent.Length;
                 lineNumber += 1;
                 lexemeStartPositionInLine = 0;
 
@@ -233,6 +250,7 @@ namespace ILangCompiler.Scanner
                 lexemeStartPositionInLine
               ));
 
+            absolutePosition += 1;
             lexemeStartPositionInLine += 1;
 
             break;
@@ -240,36 +258,36 @@ namespace ILangCompiler.Scanner
           case ':':
             maybeToken = FlushBuffer(
               currentLexemeBuffer,
-              (uint) absolutePosition,
+              ref absolutePosition,
               lineNumber,
               ref lexemeStartPositionInLine
             );
             if (maybeToken.IsSome)
               yield return maybeToken.ValueUnsafe();
-            absolutePosition = source.BaseStream.Position;
 
             yield return source.Peek()
               .Filter(c => c == '=')
               .Some<IToken>(c =>
               {
                 var result = new AssignmentOperatorToken(
-                  (uint) absolutePosition,
+                  absolutePosition,
                   lineNumber,
                   lexemeStartPositionInLine
                 );
 
                 source.Read();
-                absolutePosition = source.BaseStream.Position;
+                absolutePosition += 1;
                 lexemeStartPositionInLine += 1;
 
                 return result;
               })
               .None(new ColonSymbolToken(
-                (uint) absolutePosition,
+                absolutePosition,
                 lineNumber,
                 lexemeStartPositionInLine
               ));
 
+            absolutePosition += 1;
             lexemeStartPositionInLine += 1;
 
             break;
@@ -277,26 +295,25 @@ namespace ILangCompiler.Scanner
           case '!':
             maybeToken = FlushBuffer(
               currentLexemeBuffer,
-              (uint) absolutePosition,
+              ref absolutePosition,
               lineNumber,
               ref lexemeStartPositionInLine
             );
             if (maybeToken.IsSome)
               yield return maybeToken.ValueUnsafe();
-            absolutePosition = source.BaseStream.Position;
 
             yield return source.Peek()
               .Filter(c => c != '=')
               .Some<IToken>(_ =>
               {
                 var result = new NotEqualsOperatorToken(
-                  (uint) absolutePosition,
+                  absolutePosition,
                   lineNumber,
                   lexemeStartPositionInLine
                 );
 
                 source.Read();
-                absolutePosition = source.BaseStream.Position;
+                absolutePosition += 1;
                 lexemeStartPositionInLine += 1;
 
                 return result;
@@ -308,6 +325,7 @@ namespace ILangCompiler.Scanner
                 lexemeStartPositionInLine
               ));
 
+            absolutePosition += 1;
             lexemeStartPositionInLine += 1;
 
             break;
@@ -315,26 +333,25 @@ namespace ILangCompiler.Scanner
           case '>':
             maybeToken = FlushBuffer(
               currentLexemeBuffer,
-              (uint) absolutePosition,
+              ref absolutePosition,
               lineNumber,
               ref lexemeStartPositionInLine
             );
             if (maybeToken.IsSome)
               yield return maybeToken.ValueUnsafe();
-            absolutePosition = source.BaseStream.Position;
 
             yield return source.Peek()
               .Filter(c => c != '=')
               .Some<IToken>(_ =>
               {
                 var result = new GeOperatorToken(
-                  (uint) absolutePosition,
+                  absolutePosition,
                   lineNumber,
                   lexemeStartPositionInLine
                 );
 
                 source.Read();
-                absolutePosition = source.BaseStream.Position;
+                absolutePosition += 1;
                 lexemeStartPositionInLine += 1;
 
                 return result;
@@ -345,6 +362,7 @@ namespace ILangCompiler.Scanner
                 lexemeStartPositionInLine
               ));
 
+            absolutePosition += 1;
             lexemeStartPositionInLine += 1;
 
             break;
@@ -352,36 +370,36 @@ namespace ILangCompiler.Scanner
           case '<':
             maybeToken = FlushBuffer(
               currentLexemeBuffer,
-              (uint) absolutePosition,
+              ref absolutePosition,
               lineNumber,
               ref lexemeStartPositionInLine
             );
             if (maybeToken.IsSome)
               yield return maybeToken.ValueUnsafe();
-            absolutePosition = source.BaseStream.Position;
 
             yield return source.Peek()
               .Filter(c => c != '=')
               .Some<IToken>(_ =>
               {
                 var result = new LeOperatorToken(
-                  (uint) absolutePosition,
+                  absolutePosition,
                   lineNumber,
                   lexemeStartPositionInLine
                 );
 
                 source.Read();
-                absolutePosition = source.BaseStream.Position;
+                absolutePosition += 1;
                 lexemeStartPositionInLine += 1;
 
                 return result;
               })
               .None(new LtOperatorToken(
-                (uint) absolutePosition,
+                absolutePosition,
                 lineNumber,
                 lexemeStartPositionInLine
               ));
 
+            absolutePosition += 1;
             lexemeStartPositionInLine += 1;
 
             break;
@@ -399,7 +417,7 @@ namespace ILangCompiler.Scanner
           case ';':
             maybeToken = FlushBuffer(
               currentLexemeBuffer,
-              (uint) absolutePosition,
+              ref absolutePosition,
               lineNumber,
               ref lexemeStartPositionInLine
             );
@@ -409,26 +427,24 @@ namespace ILangCompiler.Scanner
             yield return SymbolLexemes
               .TryGetValue(((char) currentChar).ToString())
               .Some(cons => cons(
-                (uint) absolutePosition,
+                absolutePosition,
                 lineNumber,
                 lexemeStartPositionInLine
               ))
               .None(() => new UnrecognizedToken(
                   currentChar.ToString(),
-                  (uint) absolutePosition,
+                  absolutePosition,
                   lineNumber,
                   lexemeStartPositionInLine
                 )
               );
 
+            absolutePosition += 1;
             lexemeStartPositionInLine += 1;
 
             break;
 
           default:
-            if (currentLexemeBuffer.Length == 0)
-              absolutePosition = source.BaseStream.Position;
-
             currentLexemeBuffer.Append(char.ConvertFromUtf32(currentChar));
             break;
         }
@@ -436,7 +452,7 @@ namespace ILangCompiler.Scanner
 
       maybeToken = FlushBuffer(
         currentLexemeBuffer,
-        (uint) absolutePosition,
+        ref absolutePosition,
         lineNumber,
         ref lexemeStartPositionInLine
       );
@@ -446,7 +462,7 @@ namespace ILangCompiler.Scanner
 
     private Option<IToken> FlushBuffer(
       StringBuilder buffer,
-      uint absolutePosition,
+      ref uint absolutePosition,
       uint lineNumber,
       ref uint lexemeStartPositionInLine
     )
@@ -490,6 +506,7 @@ namespace ILangCompiler.Scanner
 
         buffer.Clear();
 
+        absolutePosition += (uint) lexeme.Length;
         lexemeStartPositionInLine += (uint) lexeme.Length;
 
         return result;
@@ -513,203 +530,6 @@ namespace ILangCompiler.Scanner
     > SymbolLexemes { get; } =
       new Dictionary<string, Func<uint, uint, uint, IToken>>
       {
-        // #region Keywords
-        //
-        // #region Control statements
-        //
-        // [ElseKeywordToken.LexemeValue] =
-        //   (ap, ln, pl) =>
-        //     new ElseKeywordToken(
-        //       ap,
-        //       ln,
-        //       pl
-        //     ),
-        // [ForKeywordToken.LexemeValue] =
-        //   (ap, ln, pl) =>
-        //     new ForKeywordToken(
-        //       ap,
-        //       ln,
-        //       pl
-        //     ),
-        // [IfKeywordToken.LexemeValue] =
-        //   (ap, ln, pl) =>
-        //     new IfKeywordToken(
-        //       ap,
-        //       ln,
-        //       pl
-        //     ),
-        // [LoopKeywordToken.LexemeValue] =
-        //   (ap, ln, pl) =>
-        //     new LoopKeywordToken(
-        //       ap,
-        //       ln,
-        //       pl
-        //     ),
-        // [ThenKeywordToken.LexemeValue] =
-        //   (ap, ln, pl) =>
-        //     new ThenKeywordToken(
-        //       ap,
-        //       ln,
-        //       pl
-        //     ),
-        // [WhileKeywordToken.LexemeValue] =
-        //   (ap, ln, pl) =>
-        //     new WhileKeywordToken(
-        //       ap,
-        //       ln,
-        //       pl
-        //     ),
-        //
-        // #endregion
-        //
-        // #region Declaration-related
-        //
-        // [ArrayKeywordToken.LexemeValue] =
-        //   (ap, ln, pl) =>
-        //     new ArrayKeywordToken(
-        //       ap,
-        //       ln,
-        //       pl
-        //     ),
-        // [IsKeywordToken.LexemeValue] =
-        //   (ap, ln, pl) =>
-        //     new IsKeywordToken(
-        //       ap,
-        //       ln,
-        //       pl
-        //     ),
-        // [RecordKeywordToken.LexemeValue] =
-        //   (ap, ln, pl) =>
-        //     new RecordKeywordToken(
-        //       ap,
-        //       ln,
-        //       pl
-        //     ),
-        // [RoutineKeywordToken.LexemeValue] =
-        //   (ap, ln, pl) =>
-        //     new RoutineKeywordToken(
-        //       ap,
-        //       ln,
-        //       pl
-        //     ),
-        // [TypeKeywordToken.LexemeValue] =
-        //   (ap, ln, pl) =>
-        //     new TypeKeywordToken(
-        //       ap,
-        //       ln,
-        //       pl
-        //     ),
-        // [VarKeywordToken.LexemeValue] =
-        //   (ap, ln, pl) =>
-        //     new VarKeywordToken(
-        //       ap,
-        //       ln,
-        //       pl
-        //     ),
-        //
-        // #endregion
-        //
-        // #region Boolean operations
-        //
-        // [AndKeywordToken.LexemeValue] =
-        //   (ap, ln, pl) =>
-        //     new AndKeywordToken(
-        //       ap,
-        //       ln,
-        //       pl
-        //     ),
-        // [NotKeywordToken.LexemeValue] =
-        //   (ap, ln, pl) =>
-        //     new NotKeywordToken(
-        //       ap,
-        //       ln,
-        //       pl
-        //     ),
-        // [OrKeywordToken.LexemeValue] =
-        //   (ap, ln, pl) =>
-        //     new OrKeywordToken(
-        //       ap,
-        //       ln,
-        //       pl
-        //     ),
-        // [XorKeywordToken.LexemeValue] =
-        //   (ap, ln, pl) =>
-        //     new XorKeywordToken(
-        //       ap,
-        //       ln,
-        //       pl
-        //     ),
-        //
-        // #endregion
-        //
-        // #region Primitive types
-        //
-        // [BooleanKeywordToken.LexemeValue] =
-        //   (ap, ln, pl) =>
-        //     new BooleanKeywordToken(
-        //       ap,
-        //       ln,
-        //       pl
-        //     ),
-        // [IntegerKeywordToken.LexemeValue] =
-        //   (ap, ln, pl) =>
-        //     new IntegerKeywordToken(
-        //       ap,
-        //       ln,
-        //       pl
-        //     ),
-        // [RealKeywordToken.LexemeValue] =
-        //   (ap, ln, pl) =>
-        //     new RealKeywordToken(
-        //       ap,
-        //       ln,
-        //       pl
-        //     ),
-        //
-        // #endregion
-        //
-        // #region Other
-        //
-        // [EndKeywordToken.LexemeValue] =
-        //   (ap, ln, pl) =>
-        //     new EndKeywordToken(
-        //       ap,
-        //       ln,
-        //       pl
-        //     ),
-        // [FalseKeywordToken.LexemeValue] =
-        //   (ap, ln, pl) =>
-        //     new FalseKeywordToken(
-        //       ap,
-        //       ln,
-        //       pl
-        //     ),
-        // [TrueKeywordToken.LexemeValue] =
-        //   (ap, ln, pl) =>
-        //     new TrueKeywordToken(
-        //       ap,
-        //       ln,
-        //       pl
-        //     ),
-        // [ReverseKeywordToken.LexemeValue] =
-        //   (ap, ln, pl) =>
-        //     new ReverseKeywordToken(
-        //       ap,
-        //       ln,
-        //       pl
-        //     ),
-        // [InKeywordToken.LexemeValue] =
-        //   (ap, ln, pl) =>
-        //     new InKeywordToken(
-        //       ap,
-        //       ln,
-        //       pl
-        //     ),
-        //
-        // #endregion
-        //
-        // #endregion
-
         #region Operators
 
         #region Assignment
