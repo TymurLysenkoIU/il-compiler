@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 using CommandLine;
 using FunctionalExtensions.IO;
 using ILangCompiler.Scanner;
+using ILangCompiler.Scanner.Tokens;
+using ILangCompiler.Scanner.Tokens.Literals;
+using ILangCompiler.Scanner.Tokens.Predefined.Symbols;
 using LanguageExt;
 
 namespace ILangCompiler
@@ -20,7 +23,7 @@ namespace ILangCompiler
     }
 
     public async Task Main(string[] args) =>
-      await (await Parser.Default.ParseArguments<CliOptions>(args)
+      await (await CommandLine.Parser.Default.ParseArguments<CliOptions>(args)
         .WithParsedAsync(MainWithArgs))
         .WithNotParsedAsync(MainWithoutArgs)
       ;
@@ -38,26 +41,46 @@ namespace ILangCompiler
 
         // TODO: add additional cli arguments to indicate the compilation result
         // TODO: add additional cli arguments to indicate the output file
-        var tokensString =
-          string.Join(
-            "\n",
-            tokens.Select(t =>
-              string.Join(", ",
-                new []
-                {
-                  "Lexeme: " + (t.Lexeme == "\n" ? @"\n" : t.Lexeme),
-                  $"Token: {t.GetType().Name}",
-                  // $"Absolute position: {t.AbsolutePosition}", // Broken for now
-                  $"Line number: {t.LineNumber}",
-                  $"Position in line: {t.PositionInLine}",
-                }
-              )
-            )
-          )
+        var tokensString = new StringBuilder();
+
+          // string.Join(
+          //   "\n",
+          //   tokens.Select(t =>
+          //     string.Join(", ",
+          //       new []
+          //       {
+          //         "Lexeme: " + (t.Lexeme == "\n" ? @"\n" : t.Lexeme),
+          //         $"Token: {t.GetType().Name}",
+          //         // $"Absolute position: {t.AbsolutePosition}", // Broken for now
+          //         $"Line number: {t.LineNumber}",
+          //         $"Position in line: {t.PositionInLine}",
+          //       }
+          //     )
+          //   )
+          // )
         ;
 
+        foreach (var token in tokens)
+        {
+          switch (token)
+          {
+            case NewLineSymbolToken t:
+              tokensString.Append("\n");
+              break;
+
+            case IdentifierToken t:
+            case LiteralToken _:
+              tokensString.Append($"{{{token.GetType().Name} [{token.Lexeme}] ({token.LineNumber}, {token.PositionInLine}, {token.AbsolutePosition})}} ");
+              break;
+
+            default:
+              tokensString.Append($"{{{token.GetType().Name} ({token.LineNumber}, {token.PositionInLine}, {token.AbsolutePosition})}} ");
+              break;
+          }
+        }
+
         resultEffect =
-          FConsole.WriteLine(tokensString);
+          FConsole.WriteLine(tokensString.ToString());
       }
       else
       {
