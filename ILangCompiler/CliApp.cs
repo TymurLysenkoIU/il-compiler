@@ -20,7 +20,7 @@ namespace ILangCompiler
     }
 
     public async Task Main(string[] args) =>
-      await (await Parser.Default.ParseArguments<CliOptions>(args)
+      await (await CommandLine.Parser.Default.ParseArguments<CliOptions>(args)
         .WithParsedAsync(MainWithArgs))
         .WithNotParsedAsync(MainWithoutArgs)
       ;
