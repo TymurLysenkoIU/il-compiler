@@ -33,12 +33,12 @@ namespace ILangCompiler.Parser.AST.Declarations
 
       var maybeRoutine = tokens[0];
       var maybeIdentifier = tokens[1];
-      var maybeLP = tokens[2];
+      var maybeLp = tokens[2];
 
       if (
         !(maybeRoutine is RoutineKeywordToken) ||
         !(maybeIdentifier is IdentifierToken) ||
-        !(maybeLP is LeftParenthSymbolToken)
+        !(maybeLp is LeftParenthSymbolToken)
       )
         return NotARoutineException;
 
@@ -72,15 +72,19 @@ namespace ILangCompiler.Parser.AST.Declarations
       }
       tokens = tokens.Skip(1).ToList();
 
+      //Option<ParameterNode> returnType = 
       // TODO: parse type, if the next token is :
       // TODO: parse is keyword
       // TODO: parse BodyNode
 
-      tokens.
+      //Option<ParameterNode> returnType = ;
+      //Option<BodyNode> body = ;
 
       // TODO: parse end in the end
 
       // return new RoutineDeclarationNode(identifier, parameters, );
+      //return new RoutineDeclarationNode(identifier, parameters, returnType, body);
+      return new ParseException("Simple declaration is not implemented");
     }
   }
 }

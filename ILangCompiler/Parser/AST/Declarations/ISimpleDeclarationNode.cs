@@ -9,7 +9,7 @@ namespace ILangCompiler.Parser.AST.Declarations
     {
         public static Either<ParseException, ISimpleDeclarationNode> Parse(List<IToken> tokens)
         {
-            // TODO
+            
             return new ParseException("Simple declaration is not implemented");
         }
     }

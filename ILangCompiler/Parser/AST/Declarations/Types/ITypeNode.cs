@@ -9,6 +9,7 @@ namespace ILangCompiler.Parser.AST.Declarations.Types
     {
         public static Either<ParseException, ITypeNode> Parse(List<IToken> tokens)
         {
+            
             return new ParseException("Type parsing is not implemented");
         }
     }
