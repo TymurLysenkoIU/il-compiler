@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using ILangCompiler.Parser.AST.Expressions;
 using ILangCompiler.Parser.Exceptions;
@@ -8,7 +9,7 @@ using LanguageExt;
 
 namespace ILangCompiler.Parser.AST.Statements
 {
-    public class RoutineCallNode
+    public class RoutineCallNode:IAstNode
     {
         private RoutineCallNode()
         {
@@ -18,6 +19,7 @@ namespace ILangCompiler.Parser.AST.Statements
 
         public static Either<ParseException, RoutineCallNode> Parse(List<IToken> tokens)
         {
+            Console.WriteLine("RoutineCallNode");
             // Identifier [ ( Expression { , Expression } ) ]
             if (tokens.Count < 1)
                 return NotARoutineCallException;

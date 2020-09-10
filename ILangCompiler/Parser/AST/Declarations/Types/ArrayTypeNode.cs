@@ -21,6 +21,7 @@ namespace ILangCompiler.Parser.AST.Declarations.Types
 
         public static Either<ParseException, ArrayTypeNode> Parse(List<IToken> tokens)
         {
+            Console.WriteLine("ArrayTypeNode");
             if (tokens.Count < 2)
                 return NotAnArrayTypeException;
             if (!(tokens[0] is ArrayKeywordToken) || !(tokens[1] is LeftBracketSymbolToken))

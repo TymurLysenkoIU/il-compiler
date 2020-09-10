@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using ILangCompiler.Parser.AST.Expressions;
 using ILangCompiler.Parser.Exceptions;
@@ -32,6 +33,7 @@ namespace ILangCompiler.Parser.AST.Declarations.Types
 
         public static Either<ParseException, VariableDeclarationNode> Parse(List<IToken> tokens)
         {
+            Console.WriteLine("VariableDeclarationNode");
             if (tokens.Count < 3)
                 return NotAVariableDeclarationException;
             var maybeVar = tokens[0];

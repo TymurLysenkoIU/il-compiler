@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using ILangCompiler.Parser.AST.Declarations.Types;
 using ILangCompiler.Parser.Exceptions;
@@ -10,7 +11,7 @@ using LanguageExt;
 
 namespace ILangCompiler.Parser.AST.Expressions
 {
-    public class PrimaryNode
+    public class PrimaryNode:IAstNode
     {
         private PrimaryNode()
         {
@@ -21,6 +22,7 @@ namespace ILangCompiler.Parser.AST.Expressions
 
         public static Either<ParseException, PrimaryNode> Parse(List<IToken> tokens)
         {
+            Console.WriteLine("PrimaryNode");
             if (tokens.Count < 1)
                 return NotAPrimaryException;
             if ((tokens[0] is IntegerLiteralToken) || (tokens[0] is RealLiteralToken) ||

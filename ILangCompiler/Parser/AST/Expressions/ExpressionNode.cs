@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using ILangCompiler.Parser.AST.Declarations.Types;
 using ILangCompiler.Parser.Exceptions;
@@ -19,6 +20,7 @@ namespace ILangCompiler.Parser.AST.Expressions
 
         public static Either<ParseException, ExpressionNode> Parse(List<IToken> tokens)
         {
+            Console.WriteLine("ExpressionNode");
             var maybeRelation = RelationNode.Parse(tokens);
             if (maybeRelation.IsLeft)
                 return maybeRelation.LeftToList()[0];

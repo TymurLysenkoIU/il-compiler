@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using ILangCompiler.Parser.Exceptions;
 using ILangCompiler.Scanner.Tokens;
@@ -19,6 +20,7 @@ namespace ILangCompiler.Parser.AST.Declarations.Types
 
         public static Either<ParseException, TypeDeclarationNode> Parse(List<IToken> tokens)
         {
+            Console.WriteLine("TypeDeclarationNode");
             if (tokens.Count < 3)
                 return NotATypeDeclarationException;
             if (!(tokens[0] is TypeKeywordToken) ||

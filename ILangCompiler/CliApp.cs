@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -5,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using CommandLine;
 using FunctionalExtensions.IO;
+using ILangCompiler.Parser.AST;
 using ILangCompiler.Scanner;
 using ILangCompiler.Scanner.Tokens;
 using ILangCompiler.Scanner.Tokens.Literals;
@@ -27,7 +29,7 @@ namespace ILangCompiler
         .WithParsedAsync(MainWithArgs))
         .WithNotParsedAsync(MainWithoutArgs)
       ;
-
+    
     private async Task<Unit> MainWithArgs(CliOptions options)
     {
       Task<Unit> resultEffect = Task.FromResult(Unit.Default);
@@ -39,6 +41,10 @@ namespace ILangCompiler
         using var fileReader = new SafeStreamReader(options.FilePath, Encoding.UTF8);
         var tokens = Lexer.Tokenize(fileReader);
 
+        var tokens_copy = tokens.ToList(); 
+        
+        
+        
         // TODO: add additional cli arguments to indicate the compilation result
         // TODO: add additional cli arguments to indicate the output file
         var tokensString = new StringBuilder();
@@ -81,6 +87,10 @@ namespace ILangCompiler
 
         resultEffect =
           FConsole.WriteLine(tokensString.ToString());
+        
+        
+        var parsers = ProgramNode.Parse(tokens_copy); 
+        Console.WriteLine(parsers.ToString());
       }
       else
       {

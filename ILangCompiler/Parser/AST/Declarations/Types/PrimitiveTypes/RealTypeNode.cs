@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using ILangCompiler.Parser.Exceptions;
@@ -18,6 +19,7 @@ namespace ILangCompiler.Parser.AST.Declarations.Types.PrimitiveTypes
 
         public static Either<ParseException, RealTypeNode> Parse(List<IToken> tokens)
         {
+            Console.WriteLine("RealTypeNode");
             if (tokens.Count < 1)
                 return NotARealTypeException;
             if (!(tokens[0] is RealKeywordToken))

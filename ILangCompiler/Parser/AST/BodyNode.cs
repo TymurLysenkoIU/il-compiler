@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -23,6 +24,7 @@ namespace ILangCompiler.Parser.AST
 
         public static Either<ParseException, BodyNode> Parse(List<IToken> tokens)
         {
+            Console.WriteLine("BodyNode");
             while (true)
             {
                 var maybeSimpleDeclaration1 = VariableDeclarationNode.Parse(tokens);

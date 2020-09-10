@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using ILangCompiler.Parser.Exceptions;
 using ILangCompiler.Scanner.Tokens;
 using LanguageExt;
@@ -14,7 +15,7 @@ namespace ILangCompiler.Parser.AST.Declarations.Types.PrimitiveTypes
 
         public static Either<ParseException, PrimitiveTypeNode> Parse(List<IToken> tokens)
         {
-            
+            Console.WriteLine("PrimitiveTypeNode");
             var maybeInteger = IntegerTypeNode.Parse(tokens);
             if (maybeInteger.IsLeft)
             {

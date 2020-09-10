@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using ILangCompiler.Parser.Exceptions;
 using ILangCompiler.Scanner.Tokens;
 using LanguageExt;
 
 namespace ILangCompiler.Parser.AST.Statements
 {
-    public class StatementNode
+    public class StatementNode:IAstNode
     {
         private StatementNode()
         {
@@ -15,6 +16,7 @@ namespace ILangCompiler.Parser.AST.Statements
 
         public static Either<ParseException, StatementNode> Parse(List<IToken> tokens)
         {
+            Console.WriteLine("StatementNode");
             var maybeAssignment = AssignmentNode.Parse(tokens);
             if (maybeAssignment.IsRight)
                 return new StatementNode();

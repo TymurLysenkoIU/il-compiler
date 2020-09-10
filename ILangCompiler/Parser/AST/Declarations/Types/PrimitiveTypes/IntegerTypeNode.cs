@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using ILangCompiler.Parser.Exceptions;
@@ -19,6 +20,7 @@ namespace ILangCompiler.Parser.AST.Declarations.Types.PrimitiveTypes
 
         public static Either<ParseException, IntegerTypeNode> Parse(List<IToken> tokens)
         {
+            Console.WriteLine("IntegerTypeNode");
             if (tokens.Count < 1)
                 return NotAnIntegerTypeException;
             if (!(tokens[0] is IntegerKeywordToken))

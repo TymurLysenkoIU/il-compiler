@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
@@ -10,7 +11,7 @@ using LanguageExt;
 
 namespace ILangCompiler.Parser.AST.Expressions
 {
-    public class ModifiablePrimaryNode
+    public class ModifiablePrimaryNode: IAstNode
     {
         private ModifiablePrimaryNode()
         {
@@ -21,6 +22,7 @@ namespace ILangCompiler.Parser.AST.Expressions
 
         public static Either<ParseException, ModifiablePrimaryNode> Parse(List<IToken> tokens)
         {
+            Console.WriteLine("ModifiablePrimaryNode");
             if (tokens.Count < 1)
                 return NotAModifiablePrimaryException;
             if (!(tokens[0] is IdentifierToken))

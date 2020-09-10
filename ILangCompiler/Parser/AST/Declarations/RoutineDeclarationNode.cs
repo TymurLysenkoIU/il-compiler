@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -28,6 +29,7 @@ namespace ILangCompiler.Parser.AST.Declarations
 
     public static Either<ParseException, RoutineDeclarationNode> Parse(List<IToken> tokens)
     {
+      Console.WriteLine("RoutineDeclarationNode");
       if (tokens.Count <= 3)
         return NotARoutineException;
 

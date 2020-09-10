@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using ILangCompiler.Parser.AST.Declarations;
@@ -11,6 +12,7 @@ namespace ILangCompiler.Parser.AST
 {
     public class ParameterNode : IAstNode
     {
+        
         public IdentifierToken Name;
         public ITypeNode Type;
 
@@ -24,6 +26,7 @@ namespace ILangCompiler.Parser.AST
 
         public static Either<ParseException, ParameterNode> Parse(List<IToken> tokens)
         {
+            Console.WriteLine("ParameterNode");
             if (tokens.Count < 3)
                 return NotAParameterException;
 

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using ILangCompiler.Parser.Exceptions;
 using ILangCompiler.Scanner.Tokens;
@@ -8,7 +9,7 @@ using LanguageExt;
 
 namespace ILangCompiler.Parser.AST.Expressions
 {
-    public class FactorNode
+    public class FactorNode: IAstNode
     {
         private FactorNode()
         {
@@ -18,6 +19,7 @@ namespace ILangCompiler.Parser.AST.Expressions
 
         public static Either<ParseException, FactorNode> Parse(List<IToken> tokens)
         {
+            Console.WriteLine("FactorNode");
             var maybeSummand = SummandNode.Parse(tokens);
             if (maybeSummand.IsLeft)
                 return maybeSummand.LeftToList()[0];

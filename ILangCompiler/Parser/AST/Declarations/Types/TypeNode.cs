@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using ILangCompiler.Parser.AST.Declarations.Types.PrimitiveTypes;
 using ILangCompiler.Parser.Exceptions;
@@ -16,8 +17,10 @@ namespace ILangCompiler.Parser.AST.Declarations.Types
 
         private static ParseException NotATypeException => new ParseException("Not a type");
 
+        
         public static Either<ParseException, TypeNode> Parse(List<IToken> tokens)
         {
+            Console.WriteLine("TypeNode");
             var maybePrimitiveType = PrimitiveTypeNode.Parse(tokens);
             if (maybePrimitiveType.IsLeft)
             {

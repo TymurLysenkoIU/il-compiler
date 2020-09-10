@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using ILangCompiler.Parser.AST.Declarations.Types;
@@ -9,7 +10,7 @@ using LanguageExt;
 
 namespace ILangCompiler.Parser.AST.Expressions
 {
-    public class SummandNode
+    public class SummandNode:IAstNode
     {
         private SummandNode()
         {
@@ -20,6 +21,7 @@ namespace ILangCompiler.Parser.AST.Expressions
 
         public static Either<ParseException, SummandNode> Parse(List<IToken> tokens)
         {
+            Console.WriteLine("SummandNode");
             var maybePrimary = SummandNode.Parse(tokens);
             if (maybePrimary.IsRight)
             {

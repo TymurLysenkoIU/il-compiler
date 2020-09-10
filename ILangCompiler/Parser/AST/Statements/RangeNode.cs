@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using ILangCompiler.Parser.AST.Expressions;
 using ILangCompiler.Parser.Exceptions;
@@ -9,7 +10,7 @@ using LanguageExt;
 
 namespace ILangCompiler.Parser.AST.Statements
 {
-    public class RangeNode
+    public class RangeNode:IAstNode
     {
         private RangeNode()
         {
@@ -19,6 +20,7 @@ namespace ILangCompiler.Parser.AST.Statements
 
         public static Either<ParseException, RangeNode> Parse(List<IToken> tokens)
         {
+            Console.WriteLine("RangeNode");
             if (tokens.Count < 1)
                 return NotARangeException;
             if (!(tokens[0] is InKeywordToken))

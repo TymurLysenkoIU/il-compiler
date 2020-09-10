@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using ILangCompiler.Parser.AST.Expressions;
 using ILangCompiler.Parser.Exceptions;
@@ -9,7 +10,7 @@ using LanguageExt;
 
 namespace ILangCompiler.Parser.AST.Statements
 {
-    public class AssignmentNode
+    public class AssignmentNode:IAstNode
     {
         private AssignmentNode()
         {
@@ -19,6 +20,7 @@ namespace ILangCompiler.Parser.AST.Statements
 
         public static Either<ParseException, AssignmentNode> Parse(List<IToken> tokens)
         {
+            Console.WriteLine("AssignmentNode");
             var maybeModifiablePrimary = ModifiablePrimaryNode.Parse(tokens);
             if (maybeModifiablePrimary.IsLeft)
                 return maybeModifiablePrimary.LeftToList()[0];

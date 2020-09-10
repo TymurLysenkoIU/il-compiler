@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using ILangCompiler.Parser.AST.Expressions;
 using ILangCompiler.Parser.Exceptions;
@@ -10,7 +11,7 @@ using LanguageExt;
 
 namespace ILangCompiler.Parser.AST.Statements
 {
-    public class WhileLoopNode
+    public class WhileLoopNode:IAstNode
     {
         private WhileLoopNode()
         {
@@ -20,6 +21,7 @@ namespace ILangCompiler.Parser.AST.Statements
 
         public static Either<ParseException, WhileLoopNode> Parse(List<IToken> tokens)
         {
+            Console.WriteLine("WhileLoopNode");
             if (tokens.Count < 1)
                 return NotAWhileException;
             if (!(tokens[0] is WhileKeywordToken))

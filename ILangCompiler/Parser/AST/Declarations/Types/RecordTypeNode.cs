@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -21,6 +22,7 @@ namespace ILangCompiler.Parser.AST.Declarations.Types
 
         public static Either<ParseException, RecordTypeNode> Parse(List<IToken> tokens)
         {
+            Console.WriteLine("RecordTypeNode");
             if (tokens.Count < 1)
                 return NotARecordTypeException;
             if (!(tokens[0] is RecordKeywordToken))

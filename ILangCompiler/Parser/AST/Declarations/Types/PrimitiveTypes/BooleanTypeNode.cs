@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using ILangCompiler.Parser.Exceptions;
@@ -18,6 +19,7 @@ namespace ILangCompiler.Parser.AST.Declarations.Types.PrimitiveTypes
 
         public static Either<ParseException, BooleanTypeNode> Parse(List<IToken> tokens)
         {
+            Console.WriteLine("BooleanTypeNode");
             if (tokens.Count < 1)
                 return NotABooleanTypeException;
             if (!(tokens[0] is BooleanKeywordToken))
@@ -28,6 +30,7 @@ namespace ILangCompiler.Parser.AST.Declarations.Types.PrimitiveTypes
                     tokens[0] is SemicolonSymbolToken)
                     tokens.Skip(1).ToList();
                 else break;
+            
             return new BooleanTypeNode();
         }
     }
