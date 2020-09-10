@@ -18,7 +18,7 @@ namespace ILangCompiler.Parser.AST.Declarations.Types.PrimitiveTypes
         }
         private static ParseException NotAnIntegerTypeException => new ParseException("Not an integer type");
 
-        public static Either<ParseException, IntegerTypeNode> Parse(List<IToken> tokens)
+        public static Either<ParseException, Pair<List<IToken>,IntegerTypeNode>> Parse(List<IToken> tokens)
         {
             Console.WriteLine("IntegerTypeNode");
             if (tokens.Count < 1)
@@ -29,9 +29,10 @@ namespace ILangCompiler.Parser.AST.Declarations.Types.PrimitiveTypes
             while (tokens.Count > 0)
                 if (tokens[0] is NewLineSymbolToken || tokens[0] is CommentToken|| 
                     tokens[0] is SemicolonSymbolToken)
-                    tokens.Skip(1).ToList();
+                    tokens = tokens.Skip(1).ToList();
                 else break;
-            return new IntegerTypeNode();
+            return new Pair <List<IToken>, IntegerTypeNode>(tokens, new IntegerTypeNode());
+            
         }
     }
 }

@@ -17,7 +17,7 @@ namespace ILangCompiler.Parser.AST.Declarations.Types.PrimitiveTypes
         }
         private static ParseException NotARealTypeException => new ParseException("Not a real type");
 
-        public static Either<ParseException, RealTypeNode> Parse(List<IToken> tokens)
+        public static Either<ParseException, Pair<List<IToken>,RealTypeNode>> Parse(List<IToken> tokens)
         {
             Console.WriteLine("RealTypeNode");
             if (tokens.Count < 1)
@@ -28,9 +28,9 @@ namespace ILangCompiler.Parser.AST.Declarations.Types.PrimitiveTypes
             while (tokens.Count > 0)
                 if (tokens[0] is NewLineSymbolToken || tokens[0] is CommentToken|| 
                     tokens[0] is SemicolonSymbolToken)
-                    tokens.Skip(1).ToList();
+                    tokens = tokens.Skip(1).ToList();
                 else break;
-            return new RealTypeNode();
+            return new Pair <List<IToken>, RealTypeNode>(tokens, new RealTypeNode());
         }
     }
 }

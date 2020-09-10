@@ -31,7 +31,7 @@ namespace ILangCompiler.Parser.AST.Declarations.Types
         }
         
 
-        public static Either<ParseException, VariableDeclarationNode> Parse(List<IToken> tokens)
+        public static Either<ParseException, Pair<List<IToken>, VariableDeclarationNode>> Parse(List<IToken> tokens)
         {
             Console.WriteLine("VariableDeclarationNode");
             if (tokens.Count < 3)
@@ -46,16 +46,18 @@ namespace ILangCompiler.Parser.AST.Declarations.Types
             )
                 return NotAVariableDeclarationException;
             
+
+            
             IdentifierToken identifier = (IdentifierToken) maybeIdentifier;
             tokens = tokens.Skip(2).ToList();
 
             if (tokens[0] is IsKeywordToken)
             {
-                tokens.Skip(1).ToList();
+                tokens = tokens.Skip(1).ToList();
 
                 while (tokens.Count > 0)
                     if (tokens[0] is NewLineSymbolToken || tokens[0] is CommentToken)
-                        tokens.Skip(1).ToList();
+                        tokens = tokens.Skip(1).ToList();
                     else break;
                 
                 
@@ -63,39 +65,40 @@ namespace ILangCompiler.Parser.AST.Declarations.Types
                 
                 if (maybeExpression.IsLeft)
                     return maybeExpression.LeftToList()[0];
+                tokens = maybeExpression.RightToList()[0].First;
                 
-                return new VariableDeclarationNode();
+                return new Pair<List<IToken>, VariableDeclarationNode>(tokens, new VariableDeclarationNode());
                 //return new VariableDeclarationNode(identifier, Option<TypeNode>.None, maybeExpression);
             }
     
             else if (tokens[0] is ColonSymbolToken)
             {
-                tokens.Skip(1).ToList();
+                tokens = tokens.Skip(1).ToList();
                 
                 while (tokens.Count > 0)
                     if (tokens[0] is NewLineSymbolToken || tokens[0] is CommentToken)
-                        tokens.Skip(1).ToList();
+                        tokens = tokens.Skip(1).ToList();
                     else break;
 
                 var maybeType = TypeNode.Parse(tokens);
                 if (maybeType.IsLeft)
                     return maybeType.LeftToList()[0];
-                
+                tokens = maybeType.RightToList()[0].First;
                 while (tokens.Count > 0)
                     if (tokens[0] is NewLineSymbolToken || tokens[0] is CommentToken)
-                        tokens.Skip(1).ToList();
+                        tokens = tokens.Skip(1).ToList();
                     else break;
                 
                 if (!(tokens[0] is IsKeywordToken))
-                    return new VariableDeclarationNode();
+                    return new Pair<List<IToken>, VariableDeclarationNode>(tokens, new VariableDeclarationNode());
                     //return new VariableDeclarationNode(identifier, maybeType, Option<ExpressionNode>.None);
 
                 
-                tokens.Skip(1).ToList();
+                tokens = tokens.Skip(1).ToList();
 
                 while (tokens.Count > 0)
                     if (tokens[0] is NewLineSymbolToken || tokens[0] is CommentToken)
-                        tokens.Skip(1).ToList();
+                        tokens = tokens.Skip(1).ToList();
                     else break;
             
             
@@ -103,8 +106,8 @@ namespace ILangCompiler.Parser.AST.Declarations.Types
             
                 if (maybeExpression.IsLeft)
                     return maybeExpression.LeftToList()[0];
-            
-                return new VariableDeclarationNode();
+                tokens = maybeExpression.RightToList()[0].First;
+                return new Pair<List<IToken>, VariableDeclarationNode>(tokens, new VariableDeclarationNode());
                 //return new VariableDeclarationNode(identifier, maybeType, maybeExpression);
             }
 

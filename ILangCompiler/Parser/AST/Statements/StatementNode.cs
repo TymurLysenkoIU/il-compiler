@@ -14,24 +14,43 @@ namespace ILangCompiler.Parser.AST.Statements
         }
         private static ParseException NotAStatementException => new ParseException("Not a statement");
 
-        public static Either<ParseException, StatementNode> Parse(List<IToken> tokens)
+        public static Either<ParseException, Pair<List<IToken>,StatementNode>> Parse(List<IToken> tokens)
         {
             Console.WriteLine("StatementNode");
             var maybeAssignment = AssignmentNode.Parse(tokens);
             if (maybeAssignment.IsRight)
-                return new StatementNode();
+            {
+                tokens = maybeAssignment.RightToList()[0].First;
+                return new Pair<List<IToken>,StatementNode>(tokens,new StatementNode());
+            }
+
             var maybeRoutineCall = RoutineCallNode.Parse(tokens);
             if (maybeRoutineCall.IsRight)
-                return new StatementNode();
+            {
+                tokens = maybeRoutineCall.RightToList()[0].First;
+                return new Pair<List<IToken>,StatementNode>(tokens,new StatementNode());
+            }
+
             var maybeWhileLoop = WhileLoopNode.Parse(tokens);
             if (maybeWhileLoop.IsRight)
-                return new StatementNode();
+            {
+                tokens = maybeWhileLoop.RightToList()[0].First;
+                return new Pair<List<IToken>,StatementNode>(tokens,new StatementNode());
+            }
+
             var maybeForLoop = ForLoopNode.Parse(tokens);
             if (maybeForLoop.IsRight)
-                return new StatementNode();
+            {
+                tokens = maybeForLoop.RightToList()[0].First;
+                return new Pair<List<IToken>,StatementNode>(tokens,new StatementNode());
+            }
+                
             var maybeIfStatement = IfStatementNode.Parse(tokens);
             if (maybeIfStatement.IsRight)
-                return new StatementNode();
+            {
+                tokens = maybeIfStatement.RightToList()[0].First;
+                return new Pair<List<IToken>, StatementNode>(tokens, new StatementNode());
+            }
 
             return NotAStatementException;
         }

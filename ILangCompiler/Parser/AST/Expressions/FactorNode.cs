@@ -17,38 +17,39 @@ namespace ILangCompiler.Parser.AST.Expressions
         }
         private static ParseException NotAFactorException => new ParseException("Not a factor");
 
-        public static Either<ParseException, FactorNode> Parse(List<IToken> tokens)
+        public static Either<ParseException, Pair<List<IToken>,FactorNode>> Parse(List<IToken> tokens)
         {
             Console.WriteLine("FactorNode");
             var maybeSummand = SummandNode.Parse(tokens);
             if (maybeSummand.IsLeft)
                 return maybeSummand.LeftToList()[0];
+            tokens = maybeSummand.RightToList()[0].First;
             while (tokens.Count > 0)
                 if (tokens[0] is NewLineSymbolToken || tokens[0] is CommentToken)
-                    tokens.Skip(1).ToList();
+                    tokens = tokens.Skip(1).ToList();
                 else break;
             while (true)
             {
                 if (tokens.Count < 1)
                     break;
-                if (!(tokens[0] is PlusOperatorToken) || !(tokens[0] is MinusOperatorToken))
+                if (!((tokens[0] is PlusOperatorToken) || (tokens[0] is MinusOperatorToken)))
                     break;
-                tokens.Skip(1).ToList();
+                tokens = tokens.Skip(1).ToList();
                 var maybeSummand2 = SummandNode.Parse(tokens);
                 if (maybeSummand2.IsLeft)
                     return maybeSummand2.LeftToList()[0];
-                
+                tokens = maybeSummand2.RightToList()[0].First;
                 while (tokens.Count > 0)
                     if (tokens[0] is NewLineSymbolToken || tokens[0] is CommentToken)
-                        tokens.Skip(1).ToList();
+                        tokens = tokens.Skip(1).ToList();
                     else break;
                 
             }
             while (tokens.Count > 0)
                 if (tokens[0] is NewLineSymbolToken || tokens[0] is CommentToken)
-                    tokens.Skip(1).ToList();
+                    tokens = tokens.Skip(1).ToList();
                 else break;
-            return new FactorNode();
+            return new Pair<List<IToken>,FactorNode>(tokens, new FactorNode());
         }
     }
 }

@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using CommandLine;
 using FunctionalExtensions.IO;
 using ILangCompiler.Parser.AST;
+using ILangCompiler.Parser.AST.Declarations.Types.PrimitiveTypes;
+using ILangCompiler.Parser.AST.Expressions;
 using ILangCompiler.Scanner;
 using ILangCompiler.Scanner.Tokens;
 using ILangCompiler.Scanner.Tokens.Literals;
@@ -42,6 +44,7 @@ namespace ILangCompiler
         var tokens = Lexer.Tokenize(fileReader);
 
         var tokens_copy = tokens.ToList(); 
+        var parsers = ProgramNode.Parse(tokens_copy); 
         
         
         
@@ -89,8 +92,7 @@ namespace ILangCompiler
           FConsole.WriteLine(tokensString.ToString());
         
         
-        var parsers = ProgramNode.Parse(tokens_copy); 
-        Console.WriteLine(parsers.ToString());
+        
       }
       else
       {

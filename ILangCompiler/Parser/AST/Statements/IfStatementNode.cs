@@ -19,38 +19,40 @@ namespace ILangCompiler.Parser.AST.Statements
         }
         private static ParseException NotAnIfStatementException => new ParseException("Not an if statement");
 
-        public static Either<ParseException, IfStatementNode> Parse(List<IToken> tokens)
+        public static Either<ParseException, Pair<List<IToken>,IfStatementNode>> Parse(List<IToken> tokens)
         {
             Console.WriteLine("IfStatementNode");
             if (tokens.Count < 1)
                 return NotAnIfStatementException;
             if (!(tokens[0] is IfKeywordToken))
                 return NotAnIfStatementException;
-            tokens.Skip(1).ToList();
+            tokens = tokens.Skip(1).ToList();
 
             var maybeExpression = ExpressionNode.Parse(tokens);
             if (maybeExpression.IsLeft)
                 return NotAnIfStatementException;
+            tokens = maybeExpression.RightToList()[0].First;
             
             if (tokens.Count < 1)
                 return NotAnIfStatementException;
             if (!(tokens[0] is ThenKeywordToken))
                 return NotAnIfStatementException;
-            tokens.Skip(1).ToList();
+            tokens = tokens.Skip(1).ToList();
             
             var maybeBody1 = BodyNode.Parse(tokens);
             if (maybeBody1.IsLeft)
                 return NotAnIfStatementException;
-            
+            tokens = maybeBody1.RightToList()[0].First;
             
             if (tokens.Count < 1)
                 return NotAnIfStatementException;
             if (tokens[0] is ElseKeywordToken)
             {
-                
+                tokens = tokens.Skip(1).ToList();
                 var maybeBody2 = BodyNode.Parse(tokens);
                 if (maybeBody2.IsLeft)
                     return NotAnIfStatementException;
+                tokens = maybeBody2.RightToList()[0].First;
             }
             
             
@@ -58,15 +60,15 @@ namespace ILangCompiler.Parser.AST.Statements
                 return NotAnIfStatementException;
             if (!(tokens[0] is EndKeywordToken))
                 return NotAnIfStatementException;
-            tokens.Skip(1).ToList();
+            tokens = tokens.Skip(1).ToList();
 
             while (tokens.Count > 0)
                 if (tokens[0] is NewLineSymbolToken || tokens[0] is CommentToken ||
                     tokens[0] is SemicolonSymbolToken)
-                    tokens.Skip(1).ToList();
+                    tokens = tokens.Skip(1).ToList();
                 else break;
 
-            return new IfStatementNode();
+            return new Pair<List<IToken>,IfStatementNode> (tokens, new IfStatementNode());
         }
     }
 }

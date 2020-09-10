@@ -18,41 +18,43 @@ namespace ILangCompiler.Parser.AST.Statements
         }
         private static ParseException NotARangeException => new ParseException("Not a range");
 
-        public static Either<ParseException, RangeNode> Parse(List<IToken> tokens)
+        public static Either<ParseException, Pair<List<IToken>,RangeNode>> Parse(List<IToken> tokens)
         {
             Console.WriteLine("RangeNode");
             if (tokens.Count < 1)
                 return NotARangeException;
             if (!(tokens[0] is InKeywordToken))
                 return NotARangeException;
-            tokens.Skip(1).ToList();
+            tokens = tokens.Skip(1).ToList();
 
             if (tokens.Count >= 1)
             {
                 if (tokens[0] is ReverseKeywordToken)
-                    tokens.Skip(1).ToList();
+                    tokens = tokens.Skip(1).ToList();
             }
 
             var maybeExpression1 = ExpressionNode.Parse(tokens);
             if (maybeExpression1.IsLeft)
                 return maybeExpression1.LeftToList()[0];
+            tokens = maybeExpression1.RightToList()[0].First;
             
             if (tokens.Count < 1)
                 return NotARangeException;
             if (!(tokens[0] is RangeSymbolToken))
                 return NotARangeException;
-            tokens.Skip(1).ToList();
+            tokens = tokens.Skip(1).ToList();
             
             var maybeExpression2 = ExpressionNode.Parse(tokens);
             if (maybeExpression2.IsLeft)
                 return maybeExpression2.LeftToList()[0];
+            tokens = maybeExpression2.RightToList()[0].First;
             
             while (tokens.Count > 0)
                 if (tokens[0] is NewLineSymbolToken || tokens[0] is CommentToken)
-                    tokens.Skip(1).ToList();
+                    tokens = tokens.Skip(1).ToList();
                 else break;
             
-            return new RangeNode();
+            return new Pair<List<IToken>, RangeNode>(tokens, new RangeNode());
         }
     }
 }

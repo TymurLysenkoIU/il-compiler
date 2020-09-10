@@ -13,7 +13,7 @@ namespace ILangCompiler.Parser.AST.Declarations.Types.PrimitiveTypes
         {
         }
 
-        public static Either<ParseException, PrimitiveTypeNode> Parse(List<IToken> tokens)
+        public static Either<ParseException, Pair <List<IToken>, PrimitiveTypeNode>> Parse(List<IToken> tokens)
         {
             Console.WriteLine("PrimitiveTypeNode");
             var maybeInteger = IntegerTypeNode.Parse(tokens);
@@ -25,13 +25,17 @@ namespace ILangCompiler.Parser.AST.Declarations.Types.PrimitiveTypes
                     var maybeBoolean = BooleanTypeNode.Parse(tokens);
                     if (maybeBoolean.IsLeft)
                         return NotAPrimitiveTypeException;
-                    
-                    return new PrimitiveTypeNode();
-                }
-                return new PrimitiveTypeNode();
-            }
 
-            return new PrimitiveTypeNode();
+                    tokens = maybeBoolean.RightToList()[0].First;
+                    return new Pair <List<IToken>, PrimitiveTypeNode>(tokens, new PrimitiveTypeNode());
+                    
+                }
+                tokens = maybeReal.RightToList()[0].First;
+                return new Pair <List<IToken>, PrimitiveTypeNode>(tokens, new PrimitiveTypeNode());
+
+            }
+            tokens = maybeInteger.RightToList()[0].First;
+            return new Pair <List<IToken>, PrimitiveTypeNode>(tokens, new PrimitiveTypeNode());
 
         }
     }

@@ -19,41 +19,48 @@ namespace ILangCompiler.Parser.AST.Expressions
 
         private static ParseException NotASummandException => new ParseException("Not a summand");
 
-        public static Either<ParseException, SummandNode> Parse(List<IToken> tokens)
+        public static Either<ParseException, Pair<List<IToken>, SummandNode>> Parse(List<IToken> tokens)
         {
             Console.WriteLine("SummandNode");
-            var maybePrimary = SummandNode.Parse(tokens);
+            var maybePrimary = PrimaryNode.Parse(tokens);
             if (maybePrimary.IsRight)
             {
+                tokens = maybePrimary.RightToList()[0].First;
                 while (tokens.Count > 0)
                     if (tokens[0] is NewLineSymbolToken || tokens[0] is CommentToken)
-                        tokens.Skip(1).ToList();
+                        tokens = tokens.Skip(1).ToList();
                     else break;
-                return new SummandNode();
+                return new Pair<List<IToken>, SummandNode>(tokens, new SummandNode());
             }
+
             
             if (tokens.Count < 1)
                 return NotASummandException;
             if (!(tokens[0] is LeftParenthSymbolToken))
                 return NotASummandException;
-            tokens.Skip(1).ToList();
+            tokens = tokens.Skip(1).ToList();
 
+
+            
             var maybeExpression = ExpressionNode.Parse(tokens);
             if (maybeExpression.IsLeft)
                 return maybeExpression.LeftToList()[0];
+            tokens = maybeExpression.RightToList()[0].First;
+            
+
             
             if (tokens.Count < 1)
                 return NotASummandException;
             if (!(tokens[0] is RightParenthSymbolToken))
                 return NotASummandException;
-            tokens.Skip(1).ToList();
+            tokens = tokens.Skip(1).ToList();
             
             while (tokens.Count > 0)
                 if (tokens[0] is NewLineSymbolToken || tokens[0] is CommentToken)
-                    tokens.Skip(1).ToList();
+                    tokens = tokens.Skip(1).ToList();
                 else break;
             
-            return new SummandNode();
+            return new Pair<List<IToken>, SummandNode>(tokens, new SummandNode());
         }
 
     }

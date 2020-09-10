@@ -2,8 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Runtime.InteropServices;
+using ILangCompiler.Parser.AST.Declarations.Types;
 using ILangCompiler.Parser.Exceptions;
 using ILangCompiler.Scanner.Tokens;
+using ILangCompiler.Scanner.Tokens.Predefined.Keywords;
 using ILangCompiler.Scanner.Tokens.Predefined.Keywords.Declaration;
 using ILangCompiler.Scanner.Tokens.Predefined.Symbols;
 using LanguageExt;
@@ -27,7 +30,11 @@ namespace ILangCompiler.Parser.AST.Declarations
       Body = body;
     }
 
-    public static Either<ParseException, RoutineDeclarationNode> Parse(List<IToken> tokens)
+    private RoutineDeclarationNode()
+    {
+    }
+
+    public static Either<ParseException, Pair<List<IToken>,RoutineDeclarationNode>> Parse(List<IToken> tokens)
     {
       Console.WriteLine("RoutineDeclarationNode");
       if (tokens.Count <= 3)
@@ -49,44 +56,83 @@ namespace ILangCompiler.Parser.AST.Declarations
       tokens = tokens.Skip(3).ToList();
 
       var parameters = new List<ParameterNode>();
-      while (!(tokens[0] is RightParenthSymbolToken))
+      while (true)
       {
         var maybeParameter = ParameterNode.Parse(tokens);
 
         if (maybeParameter.IsLeft)
         {
-          return maybeParameter.LeftToList()[0];
+          break;
         }
 
-        maybeParameter.Do(p => parameters.Add(p));
+        tokens = maybeParameter.RightToList()[0].First;
 
-        if (tokens.Count > 0)
-        {
-          if (!(tokens[0] is ComaSymbolToken))
-            return NotARoutineException;
-
-          tokens = tokens.Skip(1).ToList();
-        }
-        else
-        {
+        if (tokens.Count < 1)
           return NotARoutineException;
+
+        if (tokens[0] is ComaSymbolToken)
+        {
+          tokens = tokens.Skip(1).ToList();
+          continue;
         }
+
+        break;
       }
+
+      if (tokens[0] is RightParenthSymbolToken)
+      {
+        tokens = tokens.Skip(1).ToList();
+      }
+      else
+      {
+        return NotARoutineException;
+      }
+
+      if (tokens.Count < 2)
+        return NotARoutineException;
+      if (tokens[0] is ColonSymbolToken)
+      {
+        tokens = tokens.Skip(1).ToList();
+        var maybeType = TypeNode.Parse(tokens);
+        if (maybeType.IsLeft)
+          return NotARoutineException;
+        tokens = maybeType.RightToList()[0].First;
+      }
+
+      if (tokens.Count < 1)
+        return NotARoutineException;
+      if (!(tokens[0] is IsKeywordToken))
+      {
+        return NotARoutineException;
+      }
+
       tokens = tokens.Skip(1).ToList();
 
-      //Option<ParameterNode> returnType = 
-      // TODO: parse type, if the next token is :
-      // TODO: parse is keyword
-      // TODO: parse BodyNode
+      var maybeBody = BodyNode.Parse(tokens);
+      if (maybeBody.IsLeft)
+      {
+        return maybeBody.LeftToList()[0];
+      }
 
-      //Option<ParameterNode> returnType = ;
-      //Option<BodyNode> body = ;
+      tokens = maybeBody.RightToList()[0].First;
+      
+      if (tokens.Count < 1)
+        return NotARoutineException;
+      if (!(tokens[0] is EndKeywordToken))
+      {
+        return NotARoutineException;
+      }
 
-      // TODO: parse end in the end
-
-      // return new RoutineDeclarationNode(identifier, parameters, );
-      //return new RoutineDeclarationNode(identifier, parameters, returnType, body);
-      return new ParseException("Simple declaration is not implemented");
+      
+      tokens = tokens.Skip(1).ToList();
+      
+      while (tokens.Count > 0)
+        if (tokens[0] is NewLineSymbolToken || tokens[0] is CommentToken|| 
+            tokens[0] is SemicolonSymbolToken)
+          tokens = tokens.Skip(1).ToList();
+        else break;
+      
+      return new Pair<List<IToken>,RoutineDeclarationNode>(tokens, new RoutineDeclarationNode());
     }
   }
 }

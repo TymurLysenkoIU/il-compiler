@@ -12,7 +12,7 @@ routine FirstRoutine() is
 
 	FifthIdentifier := ThirdIdentifier * 5
 	SixthIdentifier := ThirdIdentifier * FourthIdentifier
-	SeventhIdentifier := FirstIdentifier and SecondIdentifier
+	SeventhIdentifier := FirstIdentifier and SecondIdentifier 
 	EigthIdentifier := FirstIdentifier xor SecondIdentifier
 
 end

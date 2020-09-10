@@ -20,17 +20,17 @@ namespace ILangCompiler.Parser.AST.Declarations.Types
             
         }
 
-        public static Either<ParseException, RecordTypeNode> Parse(List<IToken> tokens)
+        public static Either<ParseException, Pair<List<IToken>, RecordTypeNode>> Parse(List<IToken> tokens)
         {
             Console.WriteLine("RecordTypeNode");
             if (tokens.Count < 1)
                 return NotARecordTypeException;
             if (!(tokens[0] is RecordKeywordToken))
                 return NotARecordTypeException;
-            tokens.Skip(1).ToList();
+            tokens = tokens.Skip(1).ToList();
             while (tokens.Count > 0)
                 if (tokens[0] is NewLineSymbolToken || tokens[0] is CommentToken )
-                    tokens.Skip(1).ToList();
+                    tokens = tokens.Skip(1).ToList();
                 else break;
             
             while (true)
@@ -38,20 +38,21 @@ namespace ILangCompiler.Parser.AST.Declarations.Types
                 var maybeVariableDeclaration = VariableDeclarationNode.Parse(tokens);
                 if (maybeVariableDeclaration.IsLeft)
                     break;
+                tokens = maybeVariableDeclaration.RightToList()[0].First;
             }
             
             if (tokens.Count < 1)
                 return NotARecordTypeException;
             if (!(tokens[0] is EndKeywordToken))
                 return NotARecordTypeException;
-            tokens.Skip(1).ToList();
+            tokens = tokens.Skip(1).ToList();
             while (tokens.Count > 0)
                 if (tokens[0] is NewLineSymbolToken || tokens[0] is CommentToken ||
                     tokens[0] is SemicolonSymbolToken)
-                    tokens.Skip(1).ToList();
+                    tokens = tokens.Skip(1).ToList();
                 else break;
             
-            return new RecordTypeNode();
+            return new Pair<List<IToken>, RecordTypeNode>(tokens, new RecordTypeNode());
 
         }
 

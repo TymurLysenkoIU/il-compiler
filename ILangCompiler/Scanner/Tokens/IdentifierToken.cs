@@ -19,7 +19,7 @@ namespace ILangCompiler.Scanner.Tokens
     }
 
     public static readonly Regex IdentifierPatten =
-      new Regex(@"^[a-zA-Z][a-zA-Z0-9]*$", RegexOptions.Compiled);
+      new Regex(@"^[a-zA-Z_][a-zA-Z0-9_]*$", RegexOptions.Compiled);
 
     public static Option<IToken> FromString(
       string s,

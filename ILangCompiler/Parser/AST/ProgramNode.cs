@@ -32,16 +32,29 @@ namespace ILangCompiler.Parser.AST
       {
         var maybeRoutineDeclaration = RoutineDeclarationNode.Parse(tokens);
         if (maybeRoutineDeclaration.IsRight)
+        {
+          tokens = maybeRoutineDeclaration.RightToList()[0].First;
           continue;
+        }
+
         var maybeVariableDeclaration = VariableDeclarationNode.Parse(tokens);
         if (maybeVariableDeclaration.IsRight)
+        {
+          tokens = maybeVariableDeclaration.RightToList()[0].First;
           continue;
+        }
+
         var maybeTypeDeclaration = TypeDeclarationNode.Parse(tokens);
         if (maybeTypeDeclaration.IsRight)
+        {
+          tokens = maybeTypeDeclaration.RightToList()[0].First;
           continue;
+        }
+
         return maybeTypeDeclaration.LeftToList()[0];
       }
 
+      Console.WriteLine("Program is interprited Successfully");
       return Either<ParseException, ProgramNode>.Bottom;
     }
   }

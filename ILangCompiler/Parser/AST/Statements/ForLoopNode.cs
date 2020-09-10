@@ -19,49 +19,50 @@ namespace ILangCompiler.Parser.AST.Statements
         }
         private static ParseException NotAForLoopException => new ParseException("Not a for loop");
 
-        public static Either<ParseException, ForLoopNode> Parse(List<IToken> tokens)
+        public static Either<ParseException, Pair<List<IToken>,ForLoopNode>> Parse(List<IToken> tokens)
         {
             Console.WriteLine("ForLoopNode");
             if (tokens.Count < 1)
                 return NotAForLoopException;
             if (!(tokens[0] is ForKeywordToken))
                 return NotAForLoopException;
-            tokens.Skip(1).ToList();
+            tokens = tokens.Skip(1).ToList();
 
             if (tokens.Count < 1)
                 return NotAForLoopException;
             if (!(tokens[0] is IdentifierToken))
                 return NotAForLoopException;
-            tokens.Skip(1).ToList();
+            tokens = tokens.Skip(1).ToList();
 
             var maybeRange = RangeNode.Parse(tokens);
             if (maybeRange.IsLeft)
                 return maybeRange.LeftToList()[0];
+            tokens = maybeRange.RightToList()[0].First;
             
             if (tokens.Count < 1)
                 return NotAForLoopException;
             if (!(tokens[0] is LoopKeywordToken))
                 return NotAForLoopException;
-            tokens.Skip(1).ToList();
+            tokens = tokens.Skip(1).ToList();
             
             var maybeBody = BodyNode.Parse(tokens);
             if (maybeBody.IsLeft)
                 return maybeBody.LeftToList()[0];
-            
+            tokens = maybeBody.RightToList()[0].First;
             
             if (tokens.Count < 1)
                 return NotAForLoopException;
             if (!(tokens[0] is EndKeywordToken))
                 return NotAForLoopException;
-            tokens.Skip(1).ToList();
+            tokens = tokens.Skip(1).ToList();
 
             while (tokens.Count > 0)
                 if (tokens[0] is NewLineSymbolToken || tokens[0] is CommentToken ||
                     tokens[0] is SemicolonSymbolToken)
-                    tokens.Skip(1).ToList();
+                    tokens = tokens.Skip(1).ToList();
                 else break;
 
-            return new ForLoopNode();
+            return new Pair<List<IToken>,ForLoopNode>(tokens, new ForLoopNode());
         }
     }
 }

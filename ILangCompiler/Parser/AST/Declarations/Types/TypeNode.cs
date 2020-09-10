@@ -18,7 +18,7 @@ namespace ILangCompiler.Parser.AST.Declarations.Types
         private static ParseException NotATypeException => new ParseException("Not a type");
 
         
-        public static Either<ParseException, TypeNode> Parse(List<IToken> tokens)
+        public static Either<ParseException, Pair<List<IToken>, TypeNode>> Parse(List<IToken> tokens)
         {
             Console.WriteLine("TypeNode");
             var maybePrimitiveType = PrimitiveTypeNode.Parse(tokens);
@@ -35,15 +35,18 @@ namespace ILangCompiler.Parser.AST.Declarations.Types
                         if (!(tokens[0] is IdentifierToken))
                             return NotATypeException;
                         tokens = tokens.Skip(1).ToList();
-                        return new TypeNode();
+                        return new Pair<List<IToken>, TypeNode> (tokens, new TypeNode());
 
                     }
-                    return new TypeNode();
+                    tokens = maybeRecordType.RightToList()[0].First;
+                    return new Pair<List<IToken>, TypeNode> (tokens, new TypeNode());
                 }
-                return new TypeNode();
+                tokens = maybeArrayType.RightToList()[0].First;
+                return new Pair<List<IToken>, TypeNode> (tokens, new TypeNode());
             }
 
-            return new TypeNode();
+            tokens = maybePrimitiveType.RightToList()[0].First;
+            return new Pair<List<IToken>, TypeNode> (tokens, new TypeNode());
              
         }
     }

@@ -17,7 +17,7 @@ namespace ILangCompiler.Parser.AST.Statements
         }
         private static ParseException NotARoutineCallException => new ParseException("Not a routine call");
 
-        public static Either<ParseException, RoutineCallNode> Parse(List<IToken> tokens)
+        public static Either<ParseException, Pair<List<IToken>,RoutineCallNode>> Parse(List<IToken> tokens)
         {
             Console.WriteLine("RoutineCallNode");
             // Identifier [ ( Expression { , Expression } ) ]
@@ -25,30 +25,37 @@ namespace ILangCompiler.Parser.AST.Statements
                 return NotARoutineCallException;
             if (!(tokens[0] is IdentifierToken))
                 return NotARoutineCallException;
-            tokens.Skip(1).ToList();
+            tokens = tokens.Skip(1).ToList();
+            
+          
             
             if (tokens.Count < 1)
                 return NotARoutineCallException;
             if (!(tokens[0] is LeftParenthSymbolToken))
                 return NotARoutineCallException;
-            tokens.Skip(1).ToList();
+            tokens = tokens.Skip(1).ToList();
 
+            
             var maybeExpression1 = ExpressionNode.Parse(tokens);
-            if (maybeExpression1.IsLeft)
-                return NotARoutineCallException;
+            if (maybeExpression1.IsRight)
+            {
+                tokens = maybeExpression1.RightToList()[0].First;
+            }
 
+            
+            
             while (true)
             {
                 if (tokens.Count < 1)
                     break;
                 if (!(tokens[0] is ComaSymbolToken))
                     break;
-                tokens.Skip(1).ToList();
+                tokens = tokens.Skip(1).ToList();
                 
                 var maybeExpression2 = ExpressionNode.Parse(tokens);
                 if (maybeExpression2.IsLeft)
                     return NotARoutineCallException;
-    
+                tokens = maybeExpression2.RightToList()[0].First;
             }
 
 
@@ -56,14 +63,14 @@ namespace ILangCompiler.Parser.AST.Statements
                 return NotARoutineCallException;
             if (!(tokens[0] is RightParenthSymbolToken))
                 return NotARoutineCallException;
-            tokens.Skip(1).ToList();
+            tokens = tokens.Skip(1).ToList();
 
             while (tokens.Count > 0)
                 if (tokens[0] is NewLineSymbolToken || tokens[0] is CommentToken)
-                    tokens.Skip(1).ToList();
+                    tokens = tokens.Skip(1).ToList();
                 else break;
             
-            return new RoutineCallNode();
+            return new Pair<List<IToken>,RoutineCallNode> (tokens, new RoutineCallNode());
         }
     }
 }

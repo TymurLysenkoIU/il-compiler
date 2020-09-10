@@ -20,7 +20,7 @@ namespace ILangCompiler.Parser.AST.Expressions
 
         private static ParseException NotAPrimaryException => new ParseException("Not a primary");
 
-        public static Either<ParseException, PrimaryNode> Parse(List<IToken> tokens)
+        public static Either<ParseException, Pair<List<IToken>,PrimaryNode>> Parse(List<IToken> tokens)
         {
             Console.WriteLine("PrimaryNode");
             if (tokens.Count < 1)
@@ -28,17 +28,19 @@ namespace ILangCompiler.Parser.AST.Expressions
             if ((tokens[0] is IntegerLiteralToken) || (tokens[0] is RealLiteralToken) ||
                 (tokens[0] is TrueKeywordToken) || (tokens[0] is FalseKeywordToken))
             {
+                tokens = tokens.Skip(1).ToList();
                 while (tokens.Count > 0)
                     if (tokens[0] is NewLineSymbolToken || tokens[0] is CommentToken)
-                        tokens.Skip(1).ToList();
+                        tokens = tokens.Skip(1).ToList();
                     else break;
-                return new PrimaryNode();
+                return new Pair<List<IToken>,PrimaryNode>(tokens, new PrimaryNode());
             }
             
             var maybeModifiablePrimary = ModifiablePrimaryNode.Parse(tokens);
             if (maybeModifiablePrimary.IsLeft)
                 return maybeModifiablePrimary.LeftToList()[0];
-            return new PrimaryNode();
+            tokens = maybeModifiablePrimary.RightToList()[0].First;
+            return new Pair<List<IToken>,PrimaryNode>(tokens, new PrimaryNode());
         }
     }
 

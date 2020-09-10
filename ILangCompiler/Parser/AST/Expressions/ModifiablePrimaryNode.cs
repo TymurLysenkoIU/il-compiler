@@ -20,40 +20,42 @@ namespace ILangCompiler.Parser.AST.Expressions
 
         private static ParseException NotAModifiablePrimaryException => new ParseException("Not a modifiable primary");
 
-        public static Either<ParseException, ModifiablePrimaryNode> Parse(List<IToken> tokens)
+        public static Either<ParseException, Pair<List<IToken>,ModifiablePrimaryNode>> Parse(List<IToken> tokens)
         {
             Console.WriteLine("ModifiablePrimaryNode");
+            
             if (tokens.Count < 1)
                 return NotAModifiablePrimaryException;
             if (!(tokens[0] is IdentifierToken))
                 return NotAModifiablePrimaryException;
-
+            tokens = tokens.Skip(1).ToList();
             while (true)
             {
                 if (tokens.Count < 1)
-                    return new ModifiablePrimaryNode();
+                    return new Pair<List<IToken>,ModifiablePrimaryNode> (tokens, new ModifiablePrimaryNode());
 
                 if (tokens[0] is DotSymbolToken)
                 {
-                    tokens.Skip(1).ToList();
+                    tokens = tokens.Skip(1).ToList();
                     if (tokens.Count < 1)
                         return NotAModifiablePrimaryException;
                     if (!(tokens[0] is IdentifierToken))
                         return NotAModifiablePrimaryException;
-                    tokens.Skip(1).ToList();
+                    tokens = tokens.Skip(1).ToList();
                 }
                 
                 else if (tokens[0] is LeftBracketSymbolToken)
                 {
-                    tokens.Skip(1).ToList();
+                    tokens = tokens.Skip(1).ToList();
                     var maybeExpression = ExpressionNode.Parse(tokens);
                     if (maybeExpression.IsLeft)
                         return maybeExpression.LeftToList()[0];
+                    tokens = maybeExpression.RightToList()[0].First;
                     if (tokens.Count < 1)
                         return NotAModifiablePrimaryException;
                     if (!(tokens[0] is RightBracketSymbolToken))
                         return NotAModifiablePrimaryException;
-                    tokens.Skip(1).ToList();
+                    tokens = tokens.Skip(1).ToList();
                     
                 }
                 else break;
@@ -63,9 +65,9 @@ namespace ILangCompiler.Parser.AST.Expressions
             while (tokens.Count > 0)
                 if (tokens[0] is NewLineSymbolToken || tokens[0] is CommentToken ||
                     tokens[0] is SemicolonSymbolToken)
-                    tokens.Skip(1).ToList();
+                    tokens = tokens.Skip(1).ToList();
                 else break;
-            return new ModifiablePrimaryNode();
+            return new Pair<List<IToken>,ModifiablePrimaryNode> (tokens, new ModifiablePrimaryNode());;
         }
 
     }

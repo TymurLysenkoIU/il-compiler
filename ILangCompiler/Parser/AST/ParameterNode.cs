@@ -5,6 +5,7 @@ using ILangCompiler.Parser.AST.Declarations;
 using ILangCompiler.Parser.AST.Declarations.Types;
 using ILangCompiler.Parser.Exceptions;
 using ILangCompiler.Scanner.Tokens;
+using ILangCompiler.Scanner.Tokens.Predefined.Keywords.Declaration;
 using ILangCompiler.Scanner.Tokens.Predefined.Symbols;
 using LanguageExt;
 
@@ -24,26 +25,40 @@ namespace ILangCompiler.Parser.AST
             Type = type;
         }
 
-        public static Either<ParseException, ParameterNode> Parse(List<IToken> tokens)
+        private ParameterNode()
+        {
+        }
+
+        public static Either<ParseException, Pair<List<IToken>, ParameterNode>> Parse(List<IToken> tokens)
         {
             Console.WriteLine("ParameterNode");
             if (tokens.Count < 3)
                 return NotAParameterException;
 
-            var maybeIdentifier = tokens[0];
-            var maybeColon = tokens[1];
-
-            switch ((tokens[0], tokens[1]))
+            if (!(tokens[0] is IdentifierToken))
             {
-                case (IdentifierToken it, ColonSymbolToken _):
-                    var maybeType = ITypeNode.Parse(tokens.Skip(2).ToList());
-
-                    return maybeType.Map(t => new ParameterNode(it, t));
-
-                    break;
-                default:
-                    return NotAParameterException;
+                return NotAParameterException;
             }
+
+            tokens = tokens.Skip(1).ToList();
+            
+            if (!(tokens[0] is IsKeywordToken))
+            {
+                return NotAParameterException;
+            }
+
+            tokens = tokens.Skip(1).ToList();
+
+            var maybeType = TypeNode.Parse(tokens);
+
+            if (maybeType.IsLeft)
+            {
+                return maybeType.LeftToList()[0];
+            }
+
+            tokens = maybeType.RightToList()[0].First;
+
+            return new Pair<List<IToken>, ParameterNode>(tokens, new ParameterNode());
         }
     }
 }

@@ -19,43 +19,44 @@ namespace ILangCompiler.Parser.AST.Statements
         }
         private static ParseException NotAWhileException => new ParseException("Not a while");
 
-        public static Either<ParseException, WhileLoopNode> Parse(List<IToken> tokens)
+        public static Either<ParseException, Pair<List<IToken>,WhileLoopNode>> Parse(List<IToken> tokens)
         {
             Console.WriteLine("WhileLoopNode");
             if (tokens.Count < 1)
                 return NotAWhileException;
             if (!(tokens[0] is WhileKeywordToken))
                 return NotAWhileException;
-            tokens.Skip(1).ToList();
+            tokens = tokens.Skip(1).ToList();
 
             var maybeExpression = ExpressionNode.Parse(tokens);
             if (maybeExpression.IsLeft)
                 return NotAWhileException;
+            tokens = maybeExpression.RightToList()[0].First;
             
             if (tokens.Count < 1)
                 return NotAWhileException;
             if (!(tokens[0] is LoopKeywordToken))
                 return NotAWhileException;
-            tokens.Skip(1).ToList();
+            tokens = tokens.Skip(1).ToList();
             
             var maybeBody = BodyNode.Parse(tokens);
             if (maybeBody.IsLeft)
                 return NotAWhileException;
-            
+            tokens = maybeBody.RightToList()[0].First;
             
             if (tokens.Count < 1)
                 return NotAWhileException;
             if (!(tokens[0] is EndKeywordToken))
                 return NotAWhileException;
-            tokens.Skip(1).ToList();
+            tokens = tokens.Skip(1).ToList();
 
             while (tokens.Count > 0)
                 if (tokens[0] is NewLineSymbolToken || tokens[0] is CommentToken ||
                     tokens[0] is SemicolonSymbolToken)
-                    tokens.Skip(1).ToList();
+                    tokens = tokens.Skip(1).ToList();
                 else break;
 
-            return new WhileLoopNode();
+            return new Pair<List<IToken>,WhileLoopNode>(tokens, new WhileLoopNode());
         }
 
     }
