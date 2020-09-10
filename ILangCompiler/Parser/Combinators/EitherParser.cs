@@ -6,7 +6,7 @@ using ILangCompiler.Parser.Exceptions;
 using ILangCompiler.Scanner.Tokens;
 using LanguageExt;
 
-namespace ILangCompiler.Parser.Combinators.EitherParser
+namespace ILangCompiler.Parser.Combinators
 {
   public abstract class EitherParser<TE, TR> : IParser<TE, TR>
     where TE : ParseException, new()

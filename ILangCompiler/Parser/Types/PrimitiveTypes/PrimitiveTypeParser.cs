@@ -1,6 +1,6 @@
 using ILangCompiler.AST.Types.PrimitiveTypes;
 using ILangCompiler.Parser.Abstractions;
-using ILangCompiler.Parser.Combinators.EitherParser;
+using ILangCompiler.Parser.Combinators;
 using ILangCompiler.Parser.Exceptions;
 
 namespace ILangCompiler.Parser.Types.PrimitiveTypes

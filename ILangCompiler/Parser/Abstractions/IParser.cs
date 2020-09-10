@@ -9,7 +9,6 @@ namespace ILangCompiler.Parser.Abstractions
 {
   public interface IParser<TE, TR>
     where TE : ParseException
-    where TR : IAstNode
   {
     Either<TE, ParseResult<TR>> TryParse(ImmutableList<IToken> tokens);
   }
