@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using ILangCompiler.Parser.AST.Expressions;
 using ILangCompiler.Parser.Exceptions;
 using ILangCompiler.Scanner.Tokens;
 using ILangCompiler.Scanner.Tokens.Predefined.Keywords.Declaration;
@@ -22,7 +23,13 @@ namespace ILangCompiler.Parser.AST.Declarations.Types
             Type = type;
             Expression = expression;
         }
+
+        private VariableDeclarationNode()
+        {
+            
+        }
         
+
         public static Either<ParseException, VariableDeclarationNode> Parse(List<IToken> tokens)
         {
             if (tokens.Count < 3)
@@ -55,8 +62,8 @@ namespace ILangCompiler.Parser.AST.Declarations.Types
                 if (maybeExpression.IsLeft)
                     return maybeExpression.LeftToList()[0];
                 
-
-                return new VariableDeclarationNode(identifier, Option<TypeNode>.None, maybeExpression);
+                return new VariableDeclarationNode();
+                //return new VariableDeclarationNode(identifier, Option<TypeNode>.None, maybeExpression);
             }
     
             else if (tokens[0] is ColonSymbolToken)
@@ -78,7 +85,8 @@ namespace ILangCompiler.Parser.AST.Declarations.Types
                     else break;
                 
                 if (!(tokens[0] is IsKeywordToken))
-                    return new VariableDeclarationNode(identifier, maybeType, Option<ExpressionNode>.None);
+                    return new VariableDeclarationNode();
+                    //return new VariableDeclarationNode(identifier, maybeType, Option<ExpressionNode>.None);
 
                 
                 tokens.Skip(1).ToList();
@@ -94,8 +102,8 @@ namespace ILangCompiler.Parser.AST.Declarations.Types
                 if (maybeExpression.IsLeft)
                     return maybeExpression.LeftToList()[0];
             
-
-                return new VariableDeclarationNode(identifier, maybeType, maybeExpression);
+                return new VariableDeclarationNode();
+                //return new VariableDeclarationNode(identifier, maybeType, maybeExpression);
             }
 
             return NotAVariableDeclarationException;
