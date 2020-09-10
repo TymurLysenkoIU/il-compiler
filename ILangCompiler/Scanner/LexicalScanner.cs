@@ -226,23 +226,46 @@ namespace ILangCompiler.Scanner
               yield return maybeToken.ValueUnsafe();
 
             yield return source.Peek()
-              .Filter(c => c == '/')
               .Some<IToken>(c =>
               {
-                var commentContent = source.ReadLine();
+                switch (c)
+                {
+                  case '/':
+                    var commentContent = source.ReadLine();
 
-                var result = new CommentToken(
-                  $"/{commentContent}",
-                  absolutePosition,
-                  lineNumber,
-                  lexemeStartPositionInLine
-                );
+                    var commentToken = new CommentToken(
+                      $"/{commentContent}",
+                      absolutePosition,
+                      lineNumber,
+                      lexemeStartPositionInLine
+                    );
 
-                absolutePosition += (uint) commentContent.Length;
-                lineNumber += 1;
-                lexemeStartPositionInLine = 0;
+                    absolutePosition += (uint) commentContent.Length;
+                    lineNumber += 1;
+                    lexemeStartPositionInLine = 0;
 
-                return result;
+                    return commentToken;
+
+                  case '=':
+                    var notEqualsToken = new NotEqualsOperatorToken(
+                      absolutePosition,
+                      lineNumber,
+                      lexemeStartPositionInLine
+                    );
+
+                    source.Read();
+                    absolutePosition += 1;
+                    lexemeStartPositionInLine = 1;
+
+                    return notEqualsToken;
+
+                  default:
+                    return new DivideOperatorToken(
+                      (uint) source.BaseStream.Position,
+                      lineNumber,
+                      lexemeStartPositionInLine
+                    );
+                }
               })
               .None(() => new DivideOperatorToken(
                 (uint) source.BaseStream.Position,
@@ -283,44 +306,6 @@ namespace ILangCompiler.Scanner
               })
               .None(new ColonSymbolToken(
                 absolutePosition,
-                lineNumber,
-                lexemeStartPositionInLine
-              ));
-
-            absolutePosition += 1;
-            lexemeStartPositionInLine += 1;
-
-            break;
-
-          case '!':
-            maybeToken = FlushBuffer(
-              currentLexemeBuffer,
-              ref absolutePosition,
-              lineNumber,
-              ref lexemeStartPositionInLine
-            );
-            if (maybeToken.IsSome)
-              yield return maybeToken.ValueUnsafe();
-
-            yield return source.Peek()
-              .Filter(c => c == '=')
-              .Some<IToken>(_ =>
-              {
-                var result = new NotEqualsOperatorToken(
-                  absolutePosition,
-                  lineNumber,
-                  lexemeStartPositionInLine
-                );
-
-                source.Read();
-                absolutePosition += 1;
-                lexemeStartPositionInLine += 1;
-
-                return result;
-              })
-              .None(new UnrecognizedToken(
-                "!",
-                (uint) absolutePosition,
                 lineNumber,
                 lexemeStartPositionInLine
               ));
