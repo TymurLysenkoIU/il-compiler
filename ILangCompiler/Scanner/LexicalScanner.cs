@@ -303,7 +303,7 @@ namespace ILangCompiler.Scanner
               yield return maybeToken.ValueUnsafe();
 
             yield return source.Peek()
-              .Filter(c => c != '=')
+              .Filter(c => c == '=')
               .Some<IToken>(_ =>
               {
                 var result = new NotEqualsOperatorToken(
@@ -341,7 +341,7 @@ namespace ILangCompiler.Scanner
               yield return maybeToken.ValueUnsafe();
 
             yield return source.Peek()
-              .Filter(c => c != '=')
+              .Filter(c => c == '=')
               .Some<IToken>(_ =>
               {
                 var result = new GeOperatorToken(
@@ -378,7 +378,7 @@ namespace ILangCompiler.Scanner
               yield return maybeToken.ValueUnsafe();
 
             yield return source.Peek()
-              .Filter(c => c != '=')
+              .Filter(c => c == '=')
               .Some<IToken>(_ =>
               {
                 var result = new LeOperatorToken(
