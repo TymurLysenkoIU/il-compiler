@@ -12,9 +12,15 @@ namespace ILangCompiler.Parser.AST.Expressions
 {
     public class SummandNode:IAstNode
     {
-        private SummandNode()
+        public PrimaryNode Primary;
+        public ExpressionNode Expression;
+        private SummandNode(PrimaryNode primary)
         {
-            
+            Primary = primary;
+        }
+        private SummandNode(ExpressionNode expression)
+        {
+            Expression = expression;
         }
 
         private static ParseException NotASummandException => new ParseException("Not a summand");
@@ -30,7 +36,7 @@ namespace ILangCompiler.Parser.AST.Expressions
                     if (tokens[0] is NewLineSymbolToken || tokens[0] is CommentToken)
                         tokens = tokens.Skip(1).ToList();
                     else break;
-                return new Pair<List<IToken>, SummandNode>(tokens, new SummandNode());
+                return new Pair<List<IToken>, SummandNode>(tokens, new SummandNode(maybePrimary.RightToList()[0].Second));
             }
 
             
@@ -60,7 +66,9 @@ namespace ILangCompiler.Parser.AST.Expressions
                     tokens = tokens.Skip(1).ToList();
                 else break;
             
-            return new Pair<List<IToken>, SummandNode>(tokens, new SummandNode());
+            
+            
+            return new Pair<List<IToken>, SummandNode>(tokens, new SummandNode(maybeExpression.RightToList()[0].Second));
         }
 
     }
