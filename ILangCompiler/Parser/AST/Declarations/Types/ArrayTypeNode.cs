@@ -12,9 +12,17 @@ namespace ILangCompiler.Parser.AST.Declarations.Types
 {
     public class ArrayTypeNode : ITypeNode
     {
-        private ArrayTypeNode()
+        public ExpressionNode Expression;
+        public TypeNode Type;
+        private ArrayTypeNode(ExpressionNode expression, TypeNode type)
         {
-            
+            Expression = expression;
+            Type = type;
+        }
+        private ArrayTypeNode(TypeNode type)
+        {
+            Type = type;
+            Expression = null;
         }
 
         private static ParseException NotAnArrayTypeException => new ParseException("Not an array type");
@@ -44,7 +52,8 @@ namespace ILangCompiler.Parser.AST.Declarations.Types
                         tokens[0] is SemicolonSymbolToken)
                         tokens = tokens.Skip(1).ToList();
                     else break;
-                return new Pair <List<IToken>, ArrayTypeNode>(tokens, new ArrayTypeNode());
+                return new Pair <List<IToken>, ArrayTypeNode>(tokens, new ArrayTypeNode(
+                    maybeType1.RightToList()[0].Second));
 
             }
 
@@ -65,7 +74,8 @@ namespace ILangCompiler.Parser.AST.Declarations.Types
                     tokens[0] is SemicolonSymbolToken)
                     tokens = tokens.Skip(1).ToList();
                 else break;
-            return new Pair <List<IToken>, ArrayTypeNode>(tokens, new ArrayTypeNode());
+            return new Pair <List<IToken>, ArrayTypeNode>(tokens, new ArrayTypeNode(
+                maybeExpression.RightToList()[0].Second, maybeType2.RightToList()[0].Second));
             
 
         }

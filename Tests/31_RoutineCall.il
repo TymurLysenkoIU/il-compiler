@@ -3,5 +3,5 @@ routine SecondRoutine() : integer is
 end
 
 routine FirstRoutine() is 
-	var FirstIdentifier := SecondRoutine()
+	var FirstIdentifier is SecondRoutine()
 end

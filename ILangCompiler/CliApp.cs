@@ -43,9 +43,9 @@ namespace ILangCompiler
         using var fileReader = new SafeStreamReader(options.FilePath, Encoding.UTF8);
         var tokens = Lexer.Tokenize(fileReader);
 
-        var tokens_copy = tokens.ToList(); 
-        var parsers = ProgramNode.Parse(tokens_copy); 
-        
+        //var tokens_copy = tokens.ToList(); 
+        //var parsers = ProgramNode.Parse(tokens_copy); 
+        //Console.WriteLine(parsers.ToString());
         
         
         // TODO: add additional cli arguments to indicate the compilation result

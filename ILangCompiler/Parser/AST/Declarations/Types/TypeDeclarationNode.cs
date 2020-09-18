@@ -11,9 +11,12 @@ namespace ILangCompiler.Parser.AST.Declarations.Types
 {
     public class TypeDeclarationNode: ISimpleDeclarationNode
     {
-        private TypeDeclarationNode()
+        public IdentifierToken Identifier;
+        public TypeNode Type;
+        private TypeDeclarationNode(IdentifierToken identifier, TypeNode type)
         {
-            
+            Identifier = identifier;
+            Type = type;
         }
 
         private static ParseException NotATypeDeclarationException => new ParseException("Not a type declaration");
@@ -27,6 +30,9 @@ namespace ILangCompiler.Parser.AST.Declarations.Types
                 !(tokens[1] is IdentifierToken) ||
                 !(tokens[2] is IsKeywordToken))
                 return NotATypeDeclarationException;
+            
+            
+            IdentifierToken identifier = (IdentifierToken) tokens[1];
             tokens = tokens.Skip(3).ToList();
 
             var maybeType = TypeNode.Parse(tokens);
@@ -39,7 +45,8 @@ namespace ILangCompiler.Parser.AST.Declarations.Types
                     tokens = tokens.Skip(1).ToList();
                 else break;
             
-            return new Pair<List<IToken>, TypeDeclarationNode>(tokens, new TypeDeclarationNode());
+            return new Pair<List<IToken>, TypeDeclarationNode>(tokens, new TypeDeclarationNode(
+                identifier, maybeType.RightToList()[0].Second));
         }
 
     }

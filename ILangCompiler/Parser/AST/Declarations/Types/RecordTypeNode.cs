@@ -15,14 +15,16 @@ namespace ILangCompiler.Parser.AST.Declarations.Types
     {
         private static ParseException NotARecordTypeException => new ParseException("Not a record type");
 
-        private RecordTypeNode()
+        public List<VariableDeclarationNode> VariableDeclarations;
+        private RecordTypeNode(List<VariableDeclarationNode> var_decl_nodes)
         {
-            
+            VariableDeclarations = var_decl_nodes;
         }
 
         public static Either<ParseException, Pair<List<IToken>, RecordTypeNode>> Parse(List<IToken> tokens)
         {
             Console.WriteLine("RecordTypeNode");
+            var declarations = new List<VariableDeclarationNode>();
             if (tokens.Count < 1)
                 return NotARecordTypeException;
             if (!(tokens[0] is RecordKeywordToken))
@@ -38,6 +40,7 @@ namespace ILangCompiler.Parser.AST.Declarations.Types
                 var maybeVariableDeclaration = VariableDeclarationNode.Parse(tokens);
                 if (maybeVariableDeclaration.IsLeft)
                     break;
+                declarations.Add(maybeVariableDeclaration.RightToList()[0].Second);
                 tokens = maybeVariableDeclaration.RightToList()[0].First;
             }
             
@@ -52,7 +55,7 @@ namespace ILangCompiler.Parser.AST.Declarations.Types
                     tokens = tokens.Skip(1).ToList();
                 else break;
             
-            return new Pair<List<IToken>, RecordTypeNode>(tokens, new RecordTypeNode());
+            return new Pair<List<IToken>, RecordTypeNode>(tokens, new RecordTypeNode(declarations));
 
         }
 
