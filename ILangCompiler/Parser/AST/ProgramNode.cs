@@ -34,6 +34,7 @@ namespace ILangCompiler.Parser.AST
         if (maybeRoutineDeclaration.IsRight)
         {
           tokens = maybeRoutineDeclaration.RightToList()[0].First;
+          declarations.Add(maybeRoutineDeclaration.RightToList()[0].Second);
           continue;
         }
 
@@ -41,6 +42,7 @@ namespace ILangCompiler.Parser.AST
         if (maybeVariableDeclaration.IsRight)
         {
           tokens = maybeVariableDeclaration.RightToList()[0].First;
+          declarations.Add(maybeVariableDeclaration.RightToList()[0].Second);
           continue;
         }
 
@@ -48,6 +50,7 @@ namespace ILangCompiler.Parser.AST
         if (maybeTypeDeclaration.IsRight)
         {
           tokens = maybeTypeDeclaration.RightToList()[0].First;
+          declarations.Add(maybeTypeDeclaration.RightToList()[0].Second);
           continue;
         }
 
