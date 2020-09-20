@@ -12,9 +12,9 @@ namespace ILangCompiler.Parser.AST.Declarations.Types
 {
     public class VariableDeclarationNode: ISimpleDeclarationNode
     {
-        public IdentifierToken Identifier { get; }
-        public Option<TypeNode> Type { get;}
-        public Option<ExpressionNode> Expression { get; }
+        public IdentifierToken Identifier;
+        public Option<TypeNode> Type;
+        public Option<ExpressionNode> Expression;
         
         private static ParseException NotAVariableDeclarationException => new ParseException("Not a variable declaration");
 
@@ -24,12 +24,6 @@ namespace ILangCompiler.Parser.AST.Declarations.Types
             Type = type;
             Expression = expression;
         }
-
-        private VariableDeclarationNode()
-        {
-            
-        }
-        
 
         public static Either<ParseException, Pair<List<IToken>, VariableDeclarationNode>> Parse(List<IToken> tokens)
         {
@@ -67,7 +61,8 @@ namespace ILangCompiler.Parser.AST.Declarations.Types
                     return maybeExpression.LeftToList()[0];
                 tokens = maybeExpression.RightToList()[0].First;
                 
-                return new Pair<List<IToken>, VariableDeclarationNode>(tokens, new VariableDeclarationNode());
+                return new Pair<List<IToken>, VariableDeclarationNode>(tokens, new VariableDeclarationNode(
+                    identifier, Option<TypeNode>.None, maybeExpression.RightToList()[0].Second));
                 //return new VariableDeclarationNode(identifier, Option<TypeNode>.None, maybeExpression);
             }
     
@@ -90,9 +85,9 @@ namespace ILangCompiler.Parser.AST.Declarations.Types
                     else break;
                 
                 if (!(tokens[0] is IsKeywordToken))
-                    return new Pair<List<IToken>, VariableDeclarationNode>(tokens, new VariableDeclarationNode());
-                    //return new VariableDeclarationNode(identifier, maybeType, Option<ExpressionNode>.None);
-
+                    return new Pair<List<IToken>, VariableDeclarationNode>(tokens, new VariableDeclarationNode(
+                        identifier, maybeType.RightToList()[0].Second, Option<ExpressionNode>.None));
+                
                 
                 tokens = tokens.Skip(1).ToList();
 
@@ -107,8 +102,8 @@ namespace ILangCompiler.Parser.AST.Declarations.Types
                 if (maybeExpression.IsLeft)
                     return maybeExpression.LeftToList()[0];
                 tokens = maybeExpression.RightToList()[0].First;
-                return new Pair<List<IToken>, VariableDeclarationNode>(tokens, new VariableDeclarationNode());
-                //return new VariableDeclarationNode(identifier, maybeType, maybeExpression);
+                return new Pair<List<IToken>, VariableDeclarationNode>(tokens, new VariableDeclarationNode(
+                    identifier, maybeType.RightToList()[0].Second, maybeExpression.RightToList()[0].Second));
             }
 
             return NotAVariableDeclarationException;

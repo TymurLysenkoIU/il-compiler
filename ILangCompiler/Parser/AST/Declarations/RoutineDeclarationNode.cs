@@ -10,19 +10,20 @@ using ILangCompiler.Scanner.Tokens.Predefined.Keywords;
 using ILangCompiler.Scanner.Tokens.Predefined.Keywords.Declaration;
 using ILangCompiler.Scanner.Tokens.Predefined.Symbols;
 using LanguageExt;
+using static LanguageExt.Prelude;
 
 namespace ILangCompiler.Parser.AST.Declarations
 {
   public class RoutineDeclarationNode : IDeclarationNode
   {
-    public IdentifierToken Identifier { get; }
-    public ImmutableArray<ParameterNode> Parameters { get; }
-    public Option<ParameterNode> ReturnType { get; }
-    public BodyNode Body { get; }
+    public IdentifierToken Identifier;
+    public ImmutableArray<ParameterNode> Parameters;
+    public Option<TypeNode> ReturnType;
+    public BodyNode Body;
 
     private static ParseException NotARoutineException => new ParseException("Not a routine");
 
-    private RoutineDeclarationNode(IdentifierToken identifier, IEnumerable<ParameterNode> parameters, Option<ParameterNode> returnType, BodyNode body)
+    private RoutineDeclarationNode(IdentifierToken identifier, IEnumerable<ParameterNode> parameters, Option<TypeNode> returnType, BodyNode body)
     {
       Identifier = identifier;
       Parameters = parameters.ToImmutableArray();
@@ -64,7 +65,7 @@ namespace ILangCompiler.Parser.AST.Declarations
         {
           break;
         }
-
+        parameters.Add(maybeParameter.RightToList()[0].Second);
         tokens = maybeParameter.RightToList()[0].First;
 
         if (tokens.Count < 1)
@@ -90,10 +91,12 @@ namespace ILangCompiler.Parser.AST.Declarations
 
       if (tokens.Count < 2)
         return NotARoutineException;
+
+      Either<ParseException, Pair<List<IToken>, TypeNode>> maybeType = new ParseException("Dummy");
       if (tokens[0] is ColonSymbolToken)
       {
         tokens = tokens.Skip(1).ToList();
-        var maybeType = TypeNode.Parse(tokens);
+        maybeType = TypeNode.Parse(tokens);
         if (maybeType.IsLeft)
           return NotARoutineException;
         tokens = maybeType.RightToList()[0].First;
@@ -132,7 +135,10 @@ namespace ILangCompiler.Parser.AST.Declarations
           tokens = tokens.Skip(1).ToList();
         else break;
       
-      return new Pair<List<IToken>,RoutineDeclarationNode>(tokens, new RoutineDeclarationNode());
+      return new Pair<List<IToken>, RoutineDeclarationNode>(tokens, new RoutineDeclarationNode(
+        identifier, parameters, maybeType.Map<TypeNode>(pr => pr.Second).ToOption(),
+        maybeBody.RightToList()[0].Second));
+    
     }
   }
 }
