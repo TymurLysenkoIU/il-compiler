@@ -13,9 +13,12 @@ namespace ILangCompiler.Parser.AST.Statements
 {
     public class WhileLoopNode:IAstNode
     {
-        private WhileLoopNode()
+        public ExpressionNode Expression;
+        public BodyNode Body;
+        private WhileLoopNode(ExpressionNode expression, BodyNode body)
         {
-            
+            Expression = expression;
+            Body = body;
         }
         private static ParseException NotAWhileException => new ParseException("Not a while");
 
@@ -56,7 +59,8 @@ namespace ILangCompiler.Parser.AST.Statements
                     tokens = tokens.Skip(1).ToList();
                 else break;
 
-            return new Pair<List<IToken>,WhileLoopNode>(tokens, new WhileLoopNode());
+            return new Pair<List<IToken>,WhileLoopNode>(tokens, new WhileLoopNode(
+                maybeExpression.RightToList()[0].Second,maybeBody.RightToList()[0].Second));
         }
 
     }

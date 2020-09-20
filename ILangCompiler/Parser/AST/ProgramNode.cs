@@ -58,7 +58,8 @@ namespace ILangCompiler.Parser.AST
       }
 
       Console.WriteLine("Program is interprited Successfully");
-      return Either<ParseException, ProgramNode>.Bottom;
+      return new ProgramNode(declarations);
+      //return Either<ParseException, ProgramNode>.Bottom;
     }
   }
 }
