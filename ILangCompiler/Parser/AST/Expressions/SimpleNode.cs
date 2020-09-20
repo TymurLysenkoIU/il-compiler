@@ -29,6 +29,11 @@ namespace ILangCompiler.Parser.AST.Expressions
             var maybeFactor = FactorNode.Parse(tokens);
             if (maybeFactor.IsLeft)
                 return maybeFactor.LeftToList()[0];
+            
+            var factor = maybeFactor.RightToList()[0].Second;
+            var tokenlist = new List<IToken>(); 
+            var factors = new List<FactorNode>();
+            
             tokens = maybeFactor.RightToList()[0].First;
             while (tokens.Count > 0)
                 if (tokens[0] is NewLineSymbolToken || tokens[0] is CommentToken)
@@ -56,7 +61,7 @@ namespace ILangCompiler.Parser.AST.Expressions
                 if (tokens[0] is NewLineSymbolToken || tokens[0] is CommentToken)
                     tokens = tokens.Skip(1).ToList();
                 else break;
-            return new Pair<List<IToken>,SimpleNode>(tokens, new SimpleNode());
+            return new Pair<List<IToken>,SimpleNode>(tokens, new SimpleNode(factor, tokenlist, factors));
         }
     }
 }
