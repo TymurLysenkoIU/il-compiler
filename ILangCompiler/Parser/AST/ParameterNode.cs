@@ -25,10 +25,6 @@ namespace ILangCompiler.Parser.AST
             Type = type;
         }
 
-        private ParameterNode()
-        {
-        }
-
         public static Either<ParseException, Pair<List<IToken>, ParameterNode>> Parse(List<IToken> tokens)
         {
             Console.WriteLine("ParameterNode");
@@ -40,6 +36,7 @@ namespace ILangCompiler.Parser.AST
                 return NotAParameterException;
             }
 
+            IdentifierToken name = (IdentifierToken) tokens[0];
             tokens = tokens.Skip(1).ToList();
             
             if (!(tokens[0] is IsKeywordToken))
@@ -56,9 +53,10 @@ namespace ILangCompiler.Parser.AST
                 return maybeType.LeftToList()[0];
             }
 
+            ITypeNode type = maybeType.RightToList()[0].Second;
             tokens = maybeType.RightToList()[0].First;
 
-            return new Pair<List<IToken>, ParameterNode>(tokens, new ParameterNode());
+            return new Pair<List<IToken>, ParameterNode>(tokens, new ParameterNode(name, type));
         }
     }
 }

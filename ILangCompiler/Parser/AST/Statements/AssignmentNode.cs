@@ -12,9 +12,12 @@ namespace ILangCompiler.Parser.AST.Statements
 {
     public class AssignmentNode:IAstNode
     {
-        private AssignmentNode()
+        public ModifiablePrimaryNode ModifiablePrimary;
+        public ExpressionNode Expression;
+        private AssignmentNode(ModifiablePrimaryNode modPrimary, ExpressionNode expression)
         {
-            
+            ModifiablePrimary = modPrimary;
+            Expression = expression;
         }
         private static ParseException NotAnAssignmentNodeException => new ParseException("Not an assignment");
 
@@ -44,7 +47,8 @@ namespace ILangCompiler.Parser.AST.Statements
                     tokens = tokens.Skip(1).ToList();
                 else break;
 
-            return new Pair<List<IToken>, AssignmentNode>(tokens, new AssignmentNode());
+            return new Pair<List<IToken>, AssignmentNode>(tokens, new AssignmentNode(
+                maybeModifiablePrimary.RightToList()[0].Second, maybeExpression.RightToList()[0].Second));
         }
     }
 }

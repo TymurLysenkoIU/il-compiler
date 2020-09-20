@@ -13,9 +13,14 @@ namespace ILangCompiler.Parser.AST.Statements
 {
     public class ForLoopNode:IAstNode
     {
-        private ForLoopNode()
+        public IdentifierToken Identifier;
+        public RangeNode Range;
+        public BodyNode Body;
+        private ForLoopNode(IdentifierToken identifier, RangeNode range, BodyNode body)
         {
-            
+            Identifier = identifier;
+            Range = range;
+            Body = body;
         }
         private static ParseException NotAForLoopException => new ParseException("Not a for loop");
 
@@ -32,11 +37,13 @@ namespace ILangCompiler.Parser.AST.Statements
                 return NotAForLoopException;
             if (!(tokens[0] is IdentifierToken))
                 return NotAForLoopException;
+            IdentifierToken identifier = (IdentifierToken) tokens[0]; 
             tokens = tokens.Skip(1).ToList();
 
             var maybeRange = RangeNode.Parse(tokens);
             if (maybeRange.IsLeft)
                 return maybeRange.LeftToList()[0];
+            RangeNode range = maybeRange.RightToList()[0].Second;
             tokens = maybeRange.RightToList()[0].First;
             
             if (tokens.Count < 1)
@@ -48,6 +55,7 @@ namespace ILangCompiler.Parser.AST.Statements
             var maybeBody = BodyNode.Parse(tokens);
             if (maybeBody.IsLeft)
                 return maybeBody.LeftToList()[0];
+            BodyNode body = maybeBody.RightToList()[0].Second;
             tokens = maybeBody.RightToList()[0].First;
             
             if (tokens.Count < 1)
@@ -62,7 +70,8 @@ namespace ILangCompiler.Parser.AST.Statements
                     tokens = tokens.Skip(1).ToList();
                 else break;
 
-            return new Pair<List<IToken>,ForLoopNode>(tokens, new ForLoopNode());
+            return new Pair<List<IToken>,ForLoopNode>(tokens, new ForLoopNode(
+                identifier, range, body));
         }
     }
 }

@@ -13,11 +13,11 @@ namespace ILangCompiler.Parser.AST
 {
     public class BodyNode : IAstNode
     {
-        public ImmutableArray<IBodyElementNode> Elements { get; }
+        public ImmutableArray<IAstNode> Elements;
         
-        private BodyNode()
+        private BodyNode(ImmutableArray<IAstNode> elements)
         {
-            
+            Elements = elements;
         }
 
         private static ParseException NotABodyException => new ParseException("Not a body");
@@ -25,6 +25,8 @@ namespace ILangCompiler.Parser.AST
         public static Either<ParseException, Pair<List<IToken>,BodyNode>> Parse(List<IToken> tokens)
         {
             Console.WriteLine("BodyNode");
+            
+            ImmutableArray<IAstNode> elements = new ImmutableArray<IAstNode>();
             
             while (tokens.Count > 0)
                 if (tokens[0] is NewLineSymbolToken || tokens[0] is CommentToken ||
@@ -38,6 +40,7 @@ namespace ILangCompiler.Parser.AST
                 if (maybeSimpleDeclaration1.IsRight)
                 {
                     tokens = maybeSimpleDeclaration1.RightToList()[0].First;
+                    elements.Add(maybeSimpleDeclaration1.RightToList()[0].Second);
                     while (tokens.Count > 0)
                         if (tokens[0] is NewLineSymbolToken || tokens[0] is CommentToken ||
                             tokens[0] is SemicolonSymbolToken)
@@ -50,6 +53,7 @@ namespace ILangCompiler.Parser.AST
                 if (maybeSimpleDeclaration2.IsRight)
                 {
                     tokens = maybeSimpleDeclaration2.RightToList()[0].First;
+                    elements.Add(maybeSimpleDeclaration2.RightToList()[0].Second);
                     while (tokens.Count > 0)
                         if (tokens[0] is NewLineSymbolToken || tokens[0] is CommentToken ||
                             tokens[0] is SemicolonSymbolToken)
@@ -62,6 +66,7 @@ namespace ILangCompiler.Parser.AST
                 if (maybeStatement.IsRight)
                 {
                     tokens = maybeStatement.RightToList()[0].First;
+                    elements.Add(maybeStatement.RightToList()[0].Second);
                     while (tokens.Count > 0)
                         if (tokens[0] is NewLineSymbolToken || tokens[0] is CommentToken ||
                             tokens[0] is SemicolonSymbolToken)
@@ -72,7 +77,7 @@ namespace ILangCompiler.Parser.AST
                 
                 break;
             }
-            return new Pair<List<IToken>,BodyNode>(tokens, new BodyNode());
+            return new Pair<List<IToken>,BodyNode>(tokens, new BodyNode(elements));
         }
 
     }

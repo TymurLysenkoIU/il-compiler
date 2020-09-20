@@ -13,9 +13,14 @@ namespace ILangCompiler.Parser.AST.Statements
 {
     public class IfStatementNode:IAstNode
     {
-        private IfStatementNode()
+        public ExpressionNode Expression;
+        public BodyNode Body1;
+        public Option<BodyNode> Body2;
+        private IfStatementNode(ExpressionNode expression, BodyNode body1, Option<BodyNode> body2)
         {
-            
+            Expression = expression;
+            Body1 = body1;
+            Body2 = body2;
         }
         private static ParseException NotAnIfStatementException => new ParseException("Not an if statement");
 
@@ -46,10 +51,12 @@ namespace ILangCompiler.Parser.AST.Statements
             
             if (tokens.Count < 1)
                 return NotAnIfStatementException;
+            Either<ParseException, Pair<List<IToken>, BodyNode>> maybeBody2 = new ParseException("Dummy");
             if (tokens[0] is ElseKeywordToken)
             {
                 tokens = tokens.Skip(1).ToList();
-                var maybeBody2 = BodyNode.Parse(tokens);
+                
+                maybeBody2 = BodyNode.Parse(tokens);
                 if (maybeBody2.IsLeft)
                     return NotAnIfStatementException;
                 tokens = maybeBody2.RightToList()[0].First;
@@ -68,7 +75,9 @@ namespace ILangCompiler.Parser.AST.Statements
                     tokens = tokens.Skip(1).ToList();
                 else break;
 
-            return new Pair<List<IToken>,IfStatementNode> (tokens, new IfStatementNode());
+            return new Pair<List<IToken>,IfStatementNode> (tokens, new IfStatementNode(
+                maybeExpression.RightToList()[0].Second, maybeBody1.RightToList()[0].Second, 
+                maybeBody2.Map<BodyNode>(pr => pr.Second).ToOption()));
         }
     }
 }
