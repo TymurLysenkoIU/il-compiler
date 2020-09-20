@@ -12,9 +12,14 @@ namespace ILangCompiler.Parser.AST.Expressions
 {
     public class SimpleNode:IAstNode
     {
-        private SimpleNode()
+        private FactorNode Factor;
+        private List<IToken> Tokens;
+        private List<FactorNode> Factors;
+        private SimpleNode(FactorNode factor, List<IToken> tokens, List<FactorNode> factors)
         {
-            
+            Factor = factor;
+            Tokens = tokens;
+            Factors = factors;
         }
         private static ParseException NotASimpleException => new ParseException("Not a simple");
 
