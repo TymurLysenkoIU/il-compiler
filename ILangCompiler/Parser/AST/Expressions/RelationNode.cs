@@ -12,9 +12,14 @@ namespace ILangCompiler.Parser.AST.Expressions
 {
     public class RelationNode:IAstNode
     {
-        private RelationNode()
+        private SimpleNode Simple1;
+        private IToken Token;
+        private SimpleNode Simple2;
+        private RelationNode(SimpleNode simple1, IToken token, SimpleNode simple2)
         {
-            
+            Simple1 = simple1;
+            Token = token;
+            Simple2 = simple2;
         }
         private static ParseException NotARelationException => new ParseException("Not a relation");
 
@@ -24,6 +29,8 @@ namespace ILangCompiler.Parser.AST.Expressions
             var maybeSimple = SimpleNode.Parse(tokens);
             if (maybeSimple.IsLeft)
                 return maybeSimple.LeftToList()[0];
+
+            var simple = maybeSimple.RightToList()[0].Second;
             tokens = maybeSimple.RightToList()[0].First;
             if (tokens.Count < 1)
                 return new Pair<List<IToken>,RelationNode>(tokens, new RelationNode());
@@ -31,8 +38,8 @@ namespace ILangCompiler.Parser.AST.Expressions
                   tokens[0] is GeOperatorToken || tokens[0] is GtOperatorToken ||
                   tokens[0] is EqualsOperatorToken || tokens[0] is NotEqualsOperatorToken))
                 return new Pair<List<IToken>,RelationNode>(tokens, new RelationNode());
-            
-                
+
+            var token = tokens[0];
             tokens = tokens.Skip(1).ToList();
             var maybeSimple2 = SimpleNode.Parse(tokens);
             if (maybeSimple2.IsLeft)
