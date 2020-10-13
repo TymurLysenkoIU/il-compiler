@@ -25,6 +25,10 @@ namespace ILangCompiler.Parser.AST.Expressions
 
         public static Either<ParseException, Pair<List<IToken>,SimpleNode>> Parse(List<IToken> tokens)
         {
+            FactorNode factor;
+            List<IToken> tokenlist = new List<IToken>();
+            List<FactorNode> factors = new List<FactorNode>();
+            
             Console.WriteLine("SimpleNode");
             var maybeFactor = FactorNode.Parse(tokens);
             if (maybeFactor.IsLeft)

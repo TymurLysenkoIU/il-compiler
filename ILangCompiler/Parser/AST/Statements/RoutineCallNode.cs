@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using ILangCompiler.Parser.AST.Expressions;
 using ILangCompiler.Parser.Exceptions;
@@ -11,20 +12,24 @@ namespace ILangCompiler.Parser.AST.Statements
 {
     public class RoutineCallNode:IAstNode
     {
-        private RoutineCallNode()
+        public IdentifierToken Identifier;
+        public ImmutableArray<ExpressionNode> Expressions;
+        private RoutineCallNode(ImmutableArray<ExpressionNode> expressions)
         {
-            
+            Expressions = expressions;
         }
         private static ParseException NotARoutineCallException => new ParseException("Not a routine call");
 
         public static Either<ParseException, Pair<List<IToken>,RoutineCallNode>> Parse(List<IToken> tokens)
         {
+            ImmutableArray<ExpressionNode> expressions = new ImmutableArray<ExpressionNode>();
             Console.WriteLine("RoutineCallNode");
             // Identifier [ ( Expression { , Expression } ) ]
             if (tokens.Count < 1)
                 return NotARoutineCallException;
             if (!(tokens[0] is IdentifierToken))
                 return NotARoutineCallException;
+            IdentifierToken identifier = (IdentifierToken) tokens[0];
             tokens = tokens.Skip(1).ToList();
             
           
@@ -39,6 +44,7 @@ namespace ILangCompiler.Parser.AST.Statements
             var maybeExpression1 = ExpressionNode.Parse(tokens);
             if (maybeExpression1.IsRight)
             {
+                expressions.Add(maybeExpression1.RightToList()[0].Second);
                 tokens = maybeExpression1.RightToList()[0].First;
             }
 
@@ -55,6 +61,7 @@ namespace ILangCompiler.Parser.AST.Statements
                 var maybeExpression2 = ExpressionNode.Parse(tokens);
                 if (maybeExpression2.IsLeft)
                     return NotARoutineCallException;
+                expressions.Add(maybeExpression2.RightToList()[0].Second);
                 tokens = maybeExpression2.RightToList()[0].First;
             }
 
@@ -70,7 +77,8 @@ namespace ILangCompiler.Parser.AST.Statements
                     tokens = tokens.Skip(1).ToList();
                 else break;
             
-            return new Pair<List<IToken>,RoutineCallNode> (tokens, new RoutineCallNode());
+            return new Pair<List<IToken>,RoutineCallNode> (tokens, new RoutineCallNode(
+                expressions));
         }
     }
 }

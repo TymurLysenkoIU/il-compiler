@@ -8,9 +8,30 @@ namespace ILangCompiler.Parser.AST.Statements
 {
     public class StatementNode:IAstNode
     {
-        private StatementNode()
+        public AssignmentNode Assignment;
+        public RoutineCallNode RoutineCall;
+        public WhileLoopNode WhileLoop;
+        public ForLoopNode ForLoop;
+        public IfStatementNode IfStatement;
+        private StatementNode(AssignmentNode assignment)
         {
-            
+            Assignment = assignment;
+        }
+        private StatementNode(RoutineCallNode routineCall)
+        {
+            RoutineCall = routineCall;
+        }
+        private StatementNode(WhileLoopNode whileLoop)
+        {
+            WhileLoop = whileLoop;
+        }
+        private StatementNode(ForLoopNode forLoop)
+        {
+            ForLoop = forLoop;
+        }
+        private StatementNode(IfStatementNode ifStatement)
+        {
+            IfStatement = ifStatement;
         }
         private static ParseException NotAStatementException => new ParseException("Not a statement");
 
@@ -21,35 +42,40 @@ namespace ILangCompiler.Parser.AST.Statements
             if (maybeAssignment.IsRight)
             {
                 tokens = maybeAssignment.RightToList()[0].First;
-                return new Pair<List<IToken>,StatementNode>(tokens,new StatementNode());
+                return new Pair<List<IToken>,StatementNode>(tokens,new StatementNode(
+                    maybeAssignment.RightToList()[0].Second));
             }
 
             var maybeRoutineCall = RoutineCallNode.Parse(tokens);
             if (maybeRoutineCall.IsRight)
             {
                 tokens = maybeRoutineCall.RightToList()[0].First;
-                return new Pair<List<IToken>,StatementNode>(tokens,new StatementNode());
+                return new Pair<List<IToken>,StatementNode>(tokens,new StatementNode(
+                    maybeRoutineCall.RightToList()[0].Second));
             }
 
             var maybeWhileLoop = WhileLoopNode.Parse(tokens);
             if (maybeWhileLoop.IsRight)
             {
                 tokens = maybeWhileLoop.RightToList()[0].First;
-                return new Pair<List<IToken>,StatementNode>(tokens,new StatementNode());
+                return new Pair<List<IToken>,StatementNode>(tokens,new StatementNode(
+                    maybeWhileLoop.RightToList()[0].Second));
             }
 
             var maybeForLoop = ForLoopNode.Parse(tokens);
             if (maybeForLoop.IsRight)
             {
                 tokens = maybeForLoop.RightToList()[0].First;
-                return new Pair<List<IToken>,StatementNode>(tokens,new StatementNode());
+                return new Pair<List<IToken>,StatementNode>(tokens,new StatementNode(
+                    maybeWhileLoop.RightToList()[0].Second));
             }
                 
             var maybeIfStatement = IfStatementNode.Parse(tokens);
             if (maybeIfStatement.IsRight)
             {
                 tokens = maybeIfStatement.RightToList()[0].First;
-                return new Pair<List<IToken>, StatementNode>(tokens, new StatementNode());
+                return new Pair<List<IToken>, StatementNode>(tokens, new StatementNode(
+                    maybeIfStatement.RightToList()[0].Second));
             }
 
             return NotAStatementException;
