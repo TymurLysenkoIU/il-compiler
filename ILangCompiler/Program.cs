@@ -21,6 +21,7 @@ namespace ILangCompiler
     {
       // Register services for dependency injection here
       serviceCollection.AddTransient<LexicalScanner>();
+      serviceCollection.AddTransient<SemanticAnalyzer.SemanticAnalyzer>();
     }
   }
 }
