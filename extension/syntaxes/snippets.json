@@ -1,0 +1,128 @@
+{
+	"Routine declaration": {
+		"prefix": "routine",
+		"body": [
+			"routine $1 ($2) is",
+			"    $0",
+			"end"
+		],
+		"description": "Routine declaration snippet. Use tab to move cursor between positions"
+	},
+	"Int routine": {
+		"prefix": "routineint",
+		"body": [
+			"routine $1 ($2): integer is",
+			"    $0",
+			"    return",
+			"end"
+		],
+		"description": "Routine with predefined integer type"
+	},
+	"Bool routine": {
+		"prefix": "routinebool",
+		"body": [
+			"routine $1 ($2): boolean is",
+			"    $0",
+			"    return",
+			"end"
+		],
+		"description": "Routine with predefined integer type"
+	},
+
+	"If condition": {
+		"prefix": "if",
+		"body": [
+			"if ($1) then",
+			"    $0",
+			"end"
+		]
+	},
+	"If-else condition": {
+		"prefix": "if else",
+		"body": [
+			"if ($1) then",
+			"    $0",
+			"else",
+			"    ",
+			"end"
+		]
+	},
+	"For loop": {
+		"prefix": "for",
+		"body": [
+			"for $1 in $2 loop",
+			"    $0",
+			"end"
+		]
+	},
+	"For reverse loop": {
+		"prefix": "for reverse",
+		"body": [
+			"for $1 in reverse $2 loop",
+			"    $0",
+			"end"
+		]
+	},
+	"While loop": {
+		"prefix": "while",
+		"body": [
+			"while $1 loop",
+			"    $0",
+			"end"
+		]
+	},
+
+	"Type declaration": {
+		"prefix": "type",
+		"body": "type $1 is $0"
+	},
+	"Integer type": {
+		"prefix": "typeint",
+		"body": "type $1 is integer"
+	},
+	"Boolean type": {
+		"prefix": "typebool",
+		"body": "type $1 is boolean"
+	},
+	"Real type": {
+		"prefix": "typereal",
+		"body": "type $1 is real"
+	},
+	"Record type": {
+		"prefix": ["typerecord", "record"],
+		"body": [
+			"type $1 is record",
+			"    var $2: $0",
+			"end"
+		]
+	},
+	"Array type": {
+		"prefix": ["typearray", "array"],
+		"body": "type $1 is array [$2] $3"
+	},
+	"Integer Array type": {
+		"prefix": ["typearrayint", "arrayint"],
+		"body": "type $1 is array [$0] integer"
+	},
+	"Real Array type": {
+		"prefix": ["typearrayreal", "arrayreal"],
+		"body": "type $1 is array [$0] real"
+	},
+	"Bool Array type": {
+		"prefix": ["typearraybool", "arraybool"],
+		"body": "type $1 is array [$0] boolean"
+	},
+	
+	"Var declaration": {
+		"prefix": "var",
+		"body": "var $1: $0"
+	},
+	"Var assignment": {
+		"prefix": "var is",
+		"body": "var $1 is $0"
+	},
+	"Var declaration assignment": {
+		"prefix": "var _ : _ is",
+		"body": "var $1: $2 is $0"
+	}
+}

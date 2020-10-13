@@ -4,7 +4,7 @@
 	"author": "VanishMax",
 	"publisher": "vanishmax",
 	"license": "MIT",
-	"version": "0.1.0",
+	"version": "0.2.0",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/TymurLysenkoIU/il-compiler"
@@ -30,7 +30,8 @@
 				"id": "ilang",
 				"extensions": [
 					".il",
-					".ilang"
+					".ilang",
+					".isc"
 				],
 				"configuration": "./syntaxes/language-configuration.json"
 			}
@@ -40,6 +41,12 @@
 				"language": "ilang",
 				"scopeName": "source.ilang",
 				"path": "./syntaxes/ilang.tmGrammar.json"
+			}
+		],
+		"snippets": [
+			{
+				"language": "ilang",
+				"path": "./syntaxes/snippets.json"
 			}
 		],
 		"configuration": {
