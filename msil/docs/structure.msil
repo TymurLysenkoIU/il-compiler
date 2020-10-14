@@ -1,0 +1,32 @@
+.assembly extern mscorlib {}
+.assembly application {}
+
+.namespace Donis.CSharpBook {
+
+    .class Starter {
+        .method static public void Main() il managed {
+            .entrypoint
+            .locals init (valuetype Donis.CSharpBook.ZStruct obj)
+            ldloca.s obj
+            ldc.i4.s 10
+            call instance void Donis.CSharpBook.ZStruct::.ctor(int32)
+            ldloca.s obj
+
+            ldfld int32 Donis.CSharpBook.ZStruct::fielda
+            call void [mscorlib]System.Console::WriteLine(int32)
+            ret
+        }
+    }
+
+ .class value ZStruct {
+
+        .method public specialname rtspecialname instance void .ctor(int32) cil managed {
+            ldarg.0
+            ldarg.1
+            stfld int32 Donis.CSharpBook.ZStruct::fielda
+            ret
+        }
+
+        .field public int32 fielda
+    }
+}

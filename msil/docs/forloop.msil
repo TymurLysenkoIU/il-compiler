@@ -1,0 +1,27 @@
+.assembly extern mscorlib {}
+.assembly application {}
+
+.namespace Donis.CSharpBook {
+
+    .class Starter {
+
+        .method static public void Main() il managed {
+            .entrypoint
+            .locals (int32 count)
+            ldc.i4.0
+            stloc.0
+            br.s loop
+for:        ldloc count
+            ldc.i4.1
+            add
+            dup
+            stloc count
+            call void [mscorlib] System.Console::WriteLine(int32)
+loop:       ldloc count
+            ldc.i4.5
+            clt
+            brtrue.s for
+            ret
+        }
+        }
+}

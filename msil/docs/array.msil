@@ -1,0 +1,42 @@
+.assembly extern mscorlib {}
+.assembly application {}
+
+.namespace Donis.CSharpBook {
+
+    .class starter {
+
+        .method static public void Main() il managed {
+            .locals init (string [] names, int32 count)
+            .entrypoint
+            ldc.i4.3
+            newarr string
+            stloc names
+            ldloc names
+            ldc.i4.0
+            ldstr "Aqua"
+            stelem.ref
+            ldloc names
+            ldc.i4.1
+            ldstr "Violet"
+            stelem.ref
+            ldloc names
+            ldc.i4.2
+            ldstr "Orange"
+            stelem.ref
+            ldc.i4.0
+            stloc count
+loop:       ldloc names
+            ldloc count
+            ldelem.ref
+            call void [mscorlib] System.Console::WriteLine(string)
+            ldloc count
+            ldc.i4.1
+            add
+            dup
+            stloc count
+            ldc.i4.3
+            blt loop
+            ret
+        }
+    }
+}
