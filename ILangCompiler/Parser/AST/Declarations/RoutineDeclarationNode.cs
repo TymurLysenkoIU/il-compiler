@@ -91,7 +91,7 @@ namespace ILangCompiler.Parser.AST.Declarations
 
         var parameter = maybeParameter.RightToList()[0].Second;
         parameters.Add(parameter);
-        typeTable.Add(parameter.Name.Lexeme, new VariableType(parameter.Type.ToTypeRepresentation()));
+        typeTable.TryAdd(parameter.Name.Lexeme, new VariableType(parameter.Type.ToTypeRepresentation()));
         tokens = maybeParameter.RightToList()[0].First;
 
         if (tokens.Count < 1)

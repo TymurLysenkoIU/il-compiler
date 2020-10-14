@@ -62,7 +62,7 @@ namespace ILangCompiler.Parser.AST.Statements
                 return NotAForLoopException;
             IdentifierToken identifier = (IdentifierToken) tokens[0];
             var typeTable = new Dictionary<string, IEntityType>();
-            typeTable.Add(
+            typeTable.TryAdd(
                 identifier.Lexeme,
                 new VariableType(new PrimitiveTypeRepresentation(new IntegerTypeNode()))
             );

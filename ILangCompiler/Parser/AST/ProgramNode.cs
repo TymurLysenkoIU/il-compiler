@@ -63,7 +63,7 @@ namespace ILangCompiler.Parser.AST
 
           var routineDeclaration = maybeRoutineDeclaration.RightToList()[0].Second;
           declarations.Add(routineDeclaration);
-          typeTable.Add(routineDeclaration.Identifier.Lexeme, routineDeclaration.ToRoutineType());
+          typeTable.TryAdd(routineDeclaration.Identifier.Lexeme, routineDeclaration.ToRoutineType());
           continue;
         }
 
@@ -73,7 +73,7 @@ namespace ILangCompiler.Parser.AST
           tokens = maybeVariableDeclaration.RightToList()[0].First;
           var varDecl = maybeVariableDeclaration.RightToList()[0].Second;
           declarations.Add(varDecl);
-          typeTable.Add(varDecl.Identifier.Lexeme, varDecl.ToVariableType());
+          typeTable.TryAdd(varDecl.Identifier.Lexeme, varDecl.ToVariableType());
           continue;
         }
 
@@ -83,7 +83,7 @@ namespace ILangCompiler.Parser.AST
           tokens = maybeTypeDeclaration.RightToList()[0].First;
           var typeDecl = maybeTypeDeclaration.RightToList()[0].Second;
           declarations.Add(typeDecl);
-          typeTable.Add(typeDecl.Identifier.Lexeme, typeDecl.ToTypeAliasType());
+          typeTable.TryAdd(typeDecl.Identifier.Lexeme, typeDecl.ToTypeAliasType());
           continue;
         }
 

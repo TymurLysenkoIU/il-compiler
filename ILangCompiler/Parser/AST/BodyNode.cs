@@ -72,7 +72,7 @@ namespace ILangCompiler.Parser.AST
                     tokens = maybeSimpleDeclaration1.RightToList()[0].First;
                     var varDecl = maybeSimpleDeclaration1.RightToList()[0].Second;
                     elements = elements.Add(varDecl);
-                    typeTable.Add(varDecl.Identifier.Lexeme, varDecl.ToVariableType());
+                    typeTable.TryAdd(varDecl.Identifier.Lexeme, varDecl.ToVariableType());
                     while (tokens.Count > 0)
                         if (tokens[0] is NewLineSymbolToken || tokens[0] is CommentToken ||
                             tokens[0] is SemicolonSymbolToken)
@@ -87,7 +87,7 @@ namespace ILangCompiler.Parser.AST
                     tokens = maybeSimpleDeclaration2.RightToList()[0].First;
                     var typeDecl = maybeSimpleDeclaration2.RightToList()[0].Second;
                     elements = elements.Add(typeDecl);
-                    typeTable.Add(typeDecl.Identifier.Lexeme, typeDecl.ToTypeAliasType());
+                    typeTable.TryAdd(typeDecl.Identifier.Lexeme, typeDecl.ToTypeAliasType());
                     while (tokens.Count > 0)
                         if (tokens[0] is NewLineSymbolToken || tokens[0] is CommentToken ||
                             tokens[0] is SemicolonSymbolToken)
