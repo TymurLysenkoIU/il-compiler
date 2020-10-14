@@ -1,40 +1,61 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using ILangCompiler.Parser.AST.Declarations;
 using ILangCompiler.Parser.AST.Declarations.Types;
+using ILangCompiler.Parser.AST.TypeTable;
+using ILangCompiler.Parser.AST.TypeTable.TypeRepresentation;
 using ILangCompiler.Parser.Exceptions;
 using ILangCompiler.Scanner.Tokens;
 using ILangCompiler.Scanner.Tokens.Predefined.Keywords.Declaration;
 using LanguageExt;
+using static LanguageExt.Prelude;
 
 namespace ILangCompiler.Parser.AST
 {
-  public class ProgramNode : IAstNode
+  public class ProgramNode : IAstNode, ITypeTable<IEntityType>
   {
     public List<IDeclarationNode> Declarations;
 
-    private ProgramNode(IEnumerable<IDeclarationNode> declarations)
+    #region Type table
+    private readonly IDictionary<string, IEntityType> ScopeTypeTable;
+
+    IDictionary<string, IEntityType> IScopedTable<IEntityType, string>.Table => ScopeTypeTable;
+
+    Option<IScopedTable<IEntityType, string>> IScopedTable<IEntityType, string>.ParentTable { get; } = None;
+
+    #endregion
+
+    private ProgramNode(
+      IEnumerable<IDeclarationNode> declarations,
+      IDictionary<string, IEntityType> scopeTypeTable
+    )
     {
       Declarations = declarations.ToList();
+      ScopeTypeTable = scopeTypeTable;
     }
 
     public static Either<ParseException, ProgramNode> Parse(List<IToken> tokens)
     {
       Console.WriteLine("ProgramNode");
-      
-      var declarations = new List<IDeclarationNode>();
 
-      
+      var declarations = new List<IDeclarationNode>();
+      var typeTable = new Dictionary<string, IEntityType>();
+
+
       while (tokens.Count > 0)
       {
         var maybeRoutineDeclaration = RoutineDeclarationNode.Parse(tokens);
         if (maybeRoutineDeclaration.IsRight)
         {
           tokens = maybeRoutineDeclaration.RightToList()[0].First;
-          declarations.Add(maybeRoutineDeclaration.RightToList()[0].Second);
+
+          var routineDeclaration = maybeRoutineDeclaration.RightToList()[0].Second;
+          declarations.Add(routineDeclaration);
+          typeTable.Add(routineDeclaration.Identifier.Lexeme, routineDeclaration.ToRoutineType());
           continue;
         }
 
@@ -42,7 +63,9 @@ namespace ILangCompiler.Parser.AST
         if (maybeVariableDeclaration.IsRight)
         {
           tokens = maybeVariableDeclaration.RightToList()[0].First;
-          declarations.Add(maybeVariableDeclaration.RightToList()[0].Second);
+          var varDecl = maybeVariableDeclaration.RightToList()[0].Second;
+          declarations.Add(varDecl);
+          typeTable.Add(varDecl.Identifier.Lexeme, varDecl.ToVariableType());
           continue;
         }
 
@@ -50,7 +73,9 @@ namespace ILangCompiler.Parser.AST
         if (maybeTypeDeclaration.IsRight)
         {
           tokens = maybeTypeDeclaration.RightToList()[0].First;
-          declarations.Add(maybeTypeDeclaration.RightToList()[0].Second);
+          var typeDecl = maybeTypeDeclaration.RightToList()[0].Second;
+          declarations.Add(typeDecl);
+          typeTable.Add(typeDecl.Identifier.Lexeme, typeDecl.ToTypeAliasType());
           continue;
         }
 
@@ -58,7 +83,7 @@ namespace ILangCompiler.Parser.AST
       }
 
       Console.WriteLine("Program is interprited Successfully");
-      return new ProgramNode(declarations);
+      return new ProgramNode(declarations, typeTable);
       //return Either<ParseException, ProgramNode>.Bottom;
     }
   }

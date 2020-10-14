@@ -10,11 +10,11 @@ using LanguageExt;
 
 namespace ILangCompiler.Parser.AST.Declarations.Types.PrimitiveTypes
 {
-    public class IntegerTypeNode : IPrimitiveTypeNode
+    public class IntegerTypeNode : PrimitiveTypeNode, IPrimitiveTypeNode
     {
         private IntegerTypeNode()
         {
-            
+
         }
         private static ParseException NotAnIntegerTypeException => new ParseException("Not an integer type");
 
@@ -27,12 +27,12 @@ namespace ILangCompiler.Parser.AST.Declarations.Types.PrimitiveTypes
                 return NotAnIntegerTypeException;
             tokens = tokens.Skip(1).ToList();
             while (tokens.Count > 0)
-                if (tokens[0] is NewLineSymbolToken || tokens[0] is CommentToken|| 
+                if (tokens[0] is NewLineSymbolToken || tokens[0] is CommentToken||
                     tokens[0] is SemicolonSymbolToken)
                     tokens = tokens.Skip(1).ToList();
                 else break;
             return new Pair <List<IToken>, IntegerTypeNode>(tokens, new IntegerTypeNode());
-            
+
         }
     }
 }
