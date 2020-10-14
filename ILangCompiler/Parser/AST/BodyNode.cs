@@ -84,7 +84,7 @@ namespace ILangCompiler.Parser.AST
                     continue;
                 }
                 
-                var maybeExpression = StatementNode.Parse(tokens);
+                var maybeExpression = StatementNode.Parse(tokens,symT);
                 if (maybeExpression.IsRight)
                 {
                     tokens = maybeExpression.RightToList()[0].First;
