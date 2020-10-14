@@ -99,12 +99,12 @@ namespace ILangCompiler.Parser.AST
 
                 break;
             }
-            
-            
+
+
             if (tokens.Count < 1)
-                return NotABodyException;
+                return new Pair<List<IToken>, BodyNode>(tokens, new BodyNode(elements));
             if (!(tokens[0] is ReturnKeywordToken))
-                return NotABodyException;
+                return new Pair<List<IToken>, BodyNode>(tokens, new BodyNode(elements));
             tokens = tokens.Skip(1).ToList();
             var maybeExpression1 = ExpressionNode.Parse(tokens);
             if (maybeExpression1.IsRight)
