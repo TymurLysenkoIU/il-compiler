@@ -1,0 +1,29 @@
+.assembly extern mscorlib {}
+.assembly application {}
+
+.namespace Max.LocalsExample {
+    .class Starter {
+        .method static public void Main() il managed {
+            .locals (int32 one, int32 two, int32 six)
+            .entrypoint
+
+            ldc.i4.1
+            stloc one
+
+            ldc.i4.2
+            stloc two
+
+            ldc.i4.6
+            stloc six
+
+            ldloc one
+            ldloc two
+            add
+            ldloc six
+            mul
+
+            call void [mscorlib] System.Console::WriteLine(int32)
+            ret
+        }
+    }
+}
