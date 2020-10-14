@@ -9,11 +9,11 @@ using LanguageExt;
 
 namespace ILangCompiler.Parser.AST.Declarations.Types.PrimitiveTypes
 {
-    public class RealTypeNode : IPrimitiveTypeNode
+    public class RealTypeNode : PrimitiveTypeNode, IPrimitiveTypeNode
     {
         private RealTypeNode()
         {
-            
+
         }
         private static ParseException NotARealTypeException => new ParseException("Not a real type");
 
@@ -26,7 +26,7 @@ namespace ILangCompiler.Parser.AST.Declarations.Types.PrimitiveTypes
                 return NotARealTypeException;
             tokens = tokens.Skip(1).ToList();
             while (tokens.Count > 0)
-                if (tokens[0] is NewLineSymbolToken || tokens[0] is CommentToken|| 
+                if (tokens[0] is NewLineSymbolToken || tokens[0] is CommentToken||
                     tokens[0] is SemicolonSymbolToken)
                     tokens = tokens.Skip(1).ToList();
                 else break;

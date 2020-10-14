@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using ILangCompiler.Parser.AST.TypeTable;
 using ILangCompiler.Parser.Exceptions;
 using ILangCompiler.Scanner.Tokens;
 using ILangCompiler.Scanner.Tokens.Predefined.Keywords;
@@ -15,12 +16,14 @@ namespace ILangCompiler.Parser.AST.Declarations.Types
         private static ParseException NotARecordTypeException => new ParseException("Not a record type");
 
         public List<VariableDeclarationNode> VariableDeclarations;
-        private RecordTypeNode(List<VariableDeclarationNode> var_decl_nodes)
+        public SymT SymbolTable;
+        private RecordTypeNode(List<VariableDeclarationNode> varDeclNodes, SymT symT)
         {
-            VariableDeclarations = var_decl_nodes;
+            VariableDeclarations = varDeclNodes;
+            SymbolTable = symT;
         }
 
-        public static Either<ParseException, Pair<List<IToken>, RecordTypeNode>> Parse(List<IToken> tokens)
+        public static Either<ParseException, Pair<List<IToken>, RecordTypeNode>> Parse(List<IToken> tokens, SymT symT, IScopedTable<IEntityType, string> parentTypeTable)
         {
             Console.WriteLine("RecordTypeNode");
             var declarations = new List<VariableDeclarationNode>();
@@ -33,16 +36,16 @@ namespace ILangCompiler.Parser.AST.Declarations.Types
                 if (tokens[0] is NewLineSymbolToken || tokens[0] is CommentToken )
                     tokens = tokens.Skip(1).ToList();
                 else break;
-            
+
             while (true)
             {
-                var maybeVariableDeclaration = VariableDeclarationNode.Parse(tokens);
+                var maybeVariableDeclaration = VariableDeclarationNode.Parse(tokens, symT, parentTypeTable);
                 if (maybeVariableDeclaration.IsLeft)
                     break;
                 declarations.Add(maybeVariableDeclaration.RightToList()[0].Second);
                 tokens = maybeVariableDeclaration.RightToList()[0].First;
             }
-            
+
             if (tokens.Count < 1)
                 return NotARecordTypeException;
             if (!(tokens[0] is EndKeywordToken))
@@ -53,9 +56,8 @@ namespace ILangCompiler.Parser.AST.Declarations.Types
                     tokens[0] is SemicolonSymbolToken)
                     tokens = tokens.Skip(1).ToList();
                 else break;
-            
-            return new Pair<List<IToken>, RecordTypeNode>(tokens, new RecordTypeNode(declarations));
 
+            return new Pair<List<IToken>, RecordTypeNode>(tokens, new RecordTypeNode(declarations, symT));
         }
 
 

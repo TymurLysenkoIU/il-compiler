@@ -1,56 +1,89 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using ILangCompiler.Parser.AST.Declarations;
 using ILangCompiler.Parser.AST.Declarations.Types;
+using ILangCompiler.Parser.AST.TypeTable;
+using ILangCompiler.Parser.AST.TypeTable.TypeRepresentation;
 using ILangCompiler.Parser.Exceptions;
 using ILangCompiler.Scanner.Tokens;
 using ILangCompiler.Scanner.Tokens.Predefined.Keywords.Declaration;
 using LanguageExt;
+using static LanguageExt.Prelude;
 
 namespace ILangCompiler.Parser.AST
 {
-  public class ProgramNode : IAstNode
+  public class ProgramNode : IAstNode, ITypeTable<IEntityType>
   {
     public List<IDeclarationNode> Declarations;
 
-    private ProgramNode(IEnumerable<IDeclarationNode> declarations)
+    #region Type table
+
+    private readonly IDictionary<string, IEntityType> ScopeTypeTable;
+
+    IDictionary<string, IEntityType> IScopedTable<IEntityType, string>.Table => ScopeTypeTable;
+
+    Option<IScopedTable<IEntityType, string>> IScopedTable<IEntityType, string>.ParentTable { get; } = None;
+
+    #endregion
+
+    public SymT SymbolTable;
+
+    private ProgramNode(
+      IEnumerable<IDeclarationNode> declarations,
+      SymT symT,
+      IDictionary<string, IEntityType> scopeTypeTable
+    )
     {
       Declarations = declarations.ToList();
+      SymbolTable = symT;
+      ScopeTypeTable = scopeTypeTable;
     }
+
 
     public static Either<ParseException, ProgramNode> Parse(List<IToken> tokens)
     {
       Console.WriteLine("ProgramNode");
-      
-      var declarations = new List<IDeclarationNode>();
 
-      
+      var declarations = new List<IDeclarationNode>();
+      var typeTable = new Dictionary<string, IEntityType>();
+      var symT = new SymT();
+
+      var result = new ProgramNode(declarations, symT, typeTable);
+
       while (tokens.Count > 0)
       {
-        var maybeRoutineDeclaration = RoutineDeclarationNode.Parse(tokens);
+        var maybeRoutineDeclaration = RoutineDeclarationNode.Parse(tokens, symT, result);
         if (maybeRoutineDeclaration.IsRight)
         {
           tokens = maybeRoutineDeclaration.RightToList()[0].First;
-          declarations.Add(maybeRoutineDeclaration.RightToList()[0].Second);
+
+          var routineDeclaration = maybeRoutineDeclaration.RightToList()[0].Second;
+          declarations.Add(routineDeclaration);
+          typeTable.TryAdd(routineDeclaration.Identifier.Lexeme, routineDeclaration.ToRoutineType());
           continue;
         }
 
-        var maybeVariableDeclaration = VariableDeclarationNode.Parse(tokens);
+        var maybeVariableDeclaration = VariableDeclarationNode.Parse(tokens, symT, result);
         if (maybeVariableDeclaration.IsRight)
         {
           tokens = maybeVariableDeclaration.RightToList()[0].First;
-          declarations.Add(maybeVariableDeclaration.RightToList()[0].Second);
+          var varDecl = maybeVariableDeclaration.RightToList()[0].Second;
+          declarations.Add(varDecl);
+          typeTable.TryAdd(varDecl.Identifier.Lexeme, varDecl.ToVariableType());
           continue;
         }
 
-        var maybeTypeDeclaration = TypeDeclarationNode.Parse(tokens);
+        var maybeTypeDeclaration = TypeDeclarationNode.Parse(tokens, symT, result);
         if (maybeTypeDeclaration.IsRight)
         {
           tokens = maybeTypeDeclaration.RightToList()[0].First;
-          declarations.Add(maybeTypeDeclaration.RightToList()[0].Second);
+          var typeDecl = maybeTypeDeclaration.RightToList()[0].Second;
+          declarations.Add(typeDecl);
+          typeTable.TryAdd(typeDecl.Identifier.Lexeme, typeDecl.ToTypeAliasType());
           continue;
         }
 
@@ -58,7 +91,7 @@ namespace ILangCompiler.Parser.AST
       }
 
       Console.WriteLine("Program is interprited Successfully");
-      return new ProgramNode(declarations);
+      return new ProgramNode(declarations, symT, typeTable);
       //return Either<ParseException, ProgramNode>.Bottom;
     }
   }

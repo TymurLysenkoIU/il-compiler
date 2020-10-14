@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using ILangCompiler.Parser.AST.Expressions;
+using ILangCompiler.Parser.AST.TypeTable;
 using ILangCompiler.Parser.Exceptions;
 using ILangCompiler.Scanner.Tokens;
 using ILangCompiler.Scanner.Tokens.Predefined.Keywords;
@@ -24,7 +25,7 @@ namespace ILangCompiler.Parser.AST.Statements
         }
         private static ParseException NotARangeException => new ParseException("Not a range");
 
-        public static Either<ParseException, Pair<List<IToken>,RangeNode>> Parse(List<IToken> tokens)
+        public static Either<ParseException, Pair<List<IToken>,RangeNode>> Parse(List<IToken> tokens, IScopedTable<IEntityType, string> parentTypeTable)
         {
             Console.WriteLine("RangeNode");
             if (tokens.Count < 1)
@@ -43,27 +44,27 @@ namespace ILangCompiler.Parser.AST.Statements
                 }
             }
 
-            var maybeExpression1 = ExpressionNode.Parse(tokens);
+            var maybeExpression1 = ExpressionNode.Parse(tokens, parentTypeTable);
             if (maybeExpression1.IsLeft)
                 return maybeExpression1.LeftToList()[0];
             tokens = maybeExpression1.RightToList()[0].First;
-            
+
             if (tokens.Count < 1)
                 return NotARangeException;
             if (!(tokens[0] is RangeSymbolToken))
                 return NotARangeException;
             tokens = tokens.Skip(1).ToList();
-            
-            var maybeExpression2 = ExpressionNode.Parse(tokens);
+
+            var maybeExpression2 = ExpressionNode.Parse(tokens, parentTypeTable);
             if (maybeExpression2.IsLeft)
                 return maybeExpression2.LeftToList()[0];
             tokens = maybeExpression2.RightToList()[0].First;
-            
+
             while (tokens.Count > 0)
                 if (tokens[0] is NewLineSymbolToken || tokens[0] is CommentToken)
                     tokens = tokens.Skip(1).ToList();
                 else break;
-            
+
             return new Pair<List<IToken>, RangeNode>(tokens, new RangeNode(
                 maybeExpression1.RightToList()[0].Second,
                 maybeExpression2.RightToList()[0].Second,

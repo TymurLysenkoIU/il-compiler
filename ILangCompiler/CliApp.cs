@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -7,8 +6,6 @@ using System.Threading.Tasks;
 using CommandLine;
 using FunctionalExtensions.IO;
 using ILangCompiler.Parser.AST;
-using ILangCompiler.Parser.AST.Declarations.Types.PrimitiveTypes;
-using ILangCompiler.Parser.AST.Expressions;
 using ILangCompiler.Scanner;
 using ILangCompiler.Scanner.Tokens;
 using ILangCompiler.Scanner.Tokens.Literals;
@@ -20,10 +17,12 @@ namespace ILangCompiler
   public class CliApp
   {
     private LexicalScanner Lexer { get; }
+    private SemanticAnalyzer.SemanticAnalyzer SemAnalyzer { get; }
 
-    public CliApp(LexicalScanner lexicalScanner)
+    public CliApp(LexicalScanner lexicalScanner, SemanticAnalyzer.SemanticAnalyzer semanticAnalyzer)
     {
       Lexer = lexicalScanner;
+      SemAnalyzer = semanticAnalyzer;
     }
 
     public async Task Main(string[] args) =>
@@ -38,13 +37,8 @@ namespace ILangCompiler
 
       if (File.Exists(options.FilePath))
       {
-        // TODO: migrate effect to task
         using var fileReader = new SafeStreamReader(options.FilePath, Encoding.UTF8);
         var tokens = Lexer.Tokenize(fileReader).ToList();
-
-        //var tokens_copy = tokens.ToList();
-        //var parsers = ProgramNode.Parse(tokens_copy);
-        //Console.WriteLine(parsers.ToString());
 
 
         // TODO: add additional cli arguments to indicate the compilation result
@@ -88,8 +82,25 @@ namespace ILangCompiler
 
         var ast = ProgramNode.Parse(tokens);
 
-        resultEffect =
-          FConsole.WriteLine(tokensString.ToString());
+        resultEffect = ast
+          .MapLeft(
+            e => FConsole.WriteLine($"An error occurred during parsing: {e.Message}")
+          )
+          .Map(SemAnalyzer.Analyze)
+          .Map(errors => errors
+            .Fold(
+              FConsole.WriteLine(
+                errors.Count > 0 ?
+                  "Semantic errors:" :
+                  "No semantic errors occured!"
+              ),
+              (_, e) => FConsole.WriteLine($"{e.Message}")
+            )
+          )
+          .Match(
+            Left: e => e,
+            Right: e => e
+          );
       }
       else
       {

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using ILangCompiler.Parser.AST.Expressions;
+using ILangCompiler.Parser.AST.TypeTable;
 using ILangCompiler.Parser.Exceptions;
 using ILangCompiler.Scanner.Tokens;
 using ILangCompiler.Scanner.Tokens.Predefined.Keywords;
@@ -24,7 +25,7 @@ namespace ILangCompiler.Parser.AST.Statements
         }
         private static ParseException NotAnIfStatementException => new ParseException("Not an if statement");
 
-        public static Either<ParseException, Pair<List<IToken>,IfStatementNode>> Parse(List<IToken> tokens)
+        public static Either<ParseException, Pair<List<IToken>,IfStatementNode>> Parse(List<IToken> tokens, SymT symT, IScopedTable<IEntityType, string> parentTypeTable)
         {
             Console.WriteLine("IfStatementNode");
             if (tokens.Count < 1)
@@ -33,36 +34,37 @@ namespace ILangCompiler.Parser.AST.Statements
                 return NotAnIfStatementException;
             tokens = tokens.Skip(1).ToList();
 
-            var maybeExpression = ExpressionNode.Parse(tokens);
+            var maybeExpression = ExpressionNode.Parse(tokens, parentTypeTable);
             if (maybeExpression.IsLeft)
                 return NotAnIfStatementException;
             tokens = maybeExpression.RightToList()[0].First;
-            
+
             if (tokens.Count < 1)
                 return NotAnIfStatementException;
             if (!(tokens[0] is ThenKeywordToken))
                 return NotAnIfStatementException;
             tokens = tokens.Skip(1).ToList();
-            
-            var maybeBody1 = BodyNode.Parse(tokens);
+
+            var maybeBody1 = BodyNode.Parse(tokens, symT, parentTypeTable);
             if (maybeBody1.IsLeft)
                 return NotAnIfStatementException;
             tokens = maybeBody1.RightToList()[0].First;
-            
+
             if (tokens.Count < 1)
                 return NotAnIfStatementException;
             Either<ParseException, Pair<List<IToken>, BodyNode>> maybeBody2 = new ParseException("Dummy");
             if (tokens[0] is ElseKeywordToken)
             {
                 tokens = tokens.Skip(1).ToList();
-                
-                maybeBody2 = BodyNode.Parse(tokens);
+
+                maybeBody2 = BodyNode.Parse(tokens, symT, parentTypeTable);
+
                 if (maybeBody2.IsLeft)
                     return NotAnIfStatementException;
                 tokens = maybeBody2.RightToList()[0].First;
             }
-            
-            
+
+
             if (tokens.Count < 1)
                 return NotAnIfStatementException;
             if (!(tokens[0] is EndKeywordToken))
@@ -76,7 +78,7 @@ namespace ILangCompiler.Parser.AST.Statements
                 else break;
 
             return new Pair<List<IToken>,IfStatementNode> (tokens, new IfStatementNode(
-                maybeExpression.RightToList()[0].Second, maybeBody1.RightToList()[0].Second, 
+                maybeExpression.RightToList()[0].Second, maybeBody1.RightToList()[0].Second,
                 maybeBody2.Map<BodyNode>(pr => pr.Second).ToOption()));
         }
     }
