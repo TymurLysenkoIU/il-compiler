@@ -22,7 +22,7 @@ namespace ILangCompiler.Parser.AST.Statements
 
         public static Either<ParseException, Pair<List<IToken>,RoutineCallNode>> Parse(List<IToken> tokens, SymT symT)
         {
-            ImmutableArray<ExpressionNode> expressions = new ImmutableArray<ExpressionNode>();
+            ImmutableArray<ExpressionNode> expressions = ImmutableArray<ExpressionNode>.Empty;
             Console.WriteLine("RoutineCallNode");
             // Identifier [ ( Expression { , Expression } ) ]
             if (tokens.Count < 1)
@@ -44,7 +44,7 @@ namespace ILangCompiler.Parser.AST.Statements
             var maybeExpression1 = ExpressionNode.Parse(tokens);
             if (maybeExpression1.IsRight)
             {
-                expressions.Add(maybeExpression1.RightToList()[0].Second);
+                expressions = expressions.Add(maybeExpression1.RightToList()[0].Second);
                 tokens = maybeExpression1.RightToList()[0].First;
             }
 
@@ -61,7 +61,7 @@ namespace ILangCompiler.Parser.AST.Statements
                 var maybeExpression2 = ExpressionNode.Parse(tokens);
                 if (maybeExpression2.IsLeft)
                     return NotARoutineCallException;
-                expressions.Add(maybeExpression2.RightToList()[0].Second);
+                expressions = expressions.Add(maybeExpression2.RightToList()[0].Second);
                 tokens = maybeExpression2.RightToList()[0].First;
             }
 

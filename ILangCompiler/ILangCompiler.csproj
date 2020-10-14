@@ -17,4 +17,8 @@
       <ProjectReference Include="..\FunctionalExtensions\FunctionalExtensions.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="SemanticAnalyzer" />
+    </ItemGroup>
+
 </Project>

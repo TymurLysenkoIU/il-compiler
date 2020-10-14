@@ -13,11 +13,15 @@ namespace ILangCompiler.Parser.AST.Expressions
     {
         private SummandNode Summand;
         private List<IToken> Tokens;
-        private Lazy<SummandNode> Summands;
+        private List<SummandNode> Summands;
+
         private FactorNode(SummandNode summand, List<IToken> tokens, List<SummandNode> summands)
         {
-            
+            Summand = summand;
+            Tokens = tokens;
+            Summands = summands;
         }
+
         private static ParseException NotAFactorException => new ParseException("Not a factor");
 
         public static Either<ParseException, Pair<List<IToken>,FactorNode>> Parse(List<IToken> tokens)
@@ -51,7 +55,7 @@ namespace ILangCompiler.Parser.AST.Expressions
                     if (tokens[0] is NewLineSymbolToken || tokens[0] is CommentToken)
                         tokens = tokens.Skip(1).ToList();
                     else break;
-                
+
             }
             while (tokens.Count > 0)
                 if (tokens[0] is NewLineSymbolToken || tokens[0] is CommentToken)

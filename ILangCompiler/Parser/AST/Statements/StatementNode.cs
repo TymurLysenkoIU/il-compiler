@@ -67,7 +67,7 @@ namespace ILangCompiler.Parser.AST.Statements
             {
                 tokens = maybeForLoop.RightToList()[0].First;
                 return new Pair<List<IToken>,StatementNode>(tokens,new StatementNode(
-                    maybeWhileLoop.RightToList()[0].Second));
+                    maybeForLoop.RightToList()[0].Second));
             }
                 
             var maybeIfStatement = IfStatementNode.Parse(tokens, symT);

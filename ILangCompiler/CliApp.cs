@@ -31,43 +31,41 @@ namespace ILangCompiler
         .WithParsedAsync(MainWithArgs))
         .WithNotParsedAsync(MainWithoutArgs)
       ;
-    
+
     private async Task<Unit> MainWithArgs(CliOptions options)
     {
       Task<Unit> resultEffect = Task.FromResult(Unit.Default);
 
-      // TODO: migrate effect to task
       if (File.Exists(options.FilePath))
       {
         // TODO: migrate effect to task
         using var fileReader = new SafeStreamReader(options.FilePath, Encoding.UTF8);
-        var tokens = Lexer.Tokenize(fileReader);
+        var tokens = Lexer.Tokenize(fileReader).ToList();
 
-        //var tokens_copy = tokens.ToList(); 
-        //var parsers = ProgramNode.Parse(tokens_copy); 
+        //var tokens_copy = tokens.ToList();
+        //var parsers = ProgramNode.Parse(tokens_copy);
         //Console.WriteLine(parsers.ToString());
-        
-        
+
+
         // TODO: add additional cli arguments to indicate the compilation result
         // TODO: add additional cli arguments to indicate the output file
         var tokensString = new StringBuilder();
 
-          // string.Join(
-          //   "\n",
-          //   tokens.Select(t =>
-          //     string.Join(", ",
-          //       new []
-          //       {
-          //         "Lexeme: " + (t.Lexeme == "\n" ? @"\n" : t.Lexeme),
-          //         $"Token: {t.GetType().Name}",
-          //         // $"Absolute position: {t.AbsolutePosition}", // Broken for now
-          //         $"Line number: {t.LineNumber}",
-          //         $"Position in line: {t.PositionInLine}",
-          //       }
-          //     )
-          //   )
-          // )
-        ;
+        // string.Join(
+        //   "\n",
+        //   tokens.Select(t =>
+        //     string.Join(", ",
+        //       new []
+        //       {
+        //         "Lexeme: " + (t.Lexeme == "\n" ? @"\n" : t.Lexeme),
+        //         $"Token: {t.GetType().Name}",
+        //         // $"Absolute position: {t.AbsolutePosition}",
+        //         $"Line number: {t.LineNumber}",
+        //         $"Position in line: {t.PositionInLine}",
+        //       }
+        //     )
+        //   )
+        // );
 
         foreach (var token in tokens)
         {
@@ -88,11 +86,10 @@ namespace ILangCompiler
           }
         }
 
+        var ast = ProgramNode.Parse(tokens);
+
         resultEffect =
           FConsole.WriteLine(tokensString.ToString());
-        
-        
-        
       }
       else
       {

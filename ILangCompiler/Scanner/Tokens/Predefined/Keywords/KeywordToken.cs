@@ -85,6 +85,13 @@ namespace ILangCompiler.Scanner.Tokens.Predefined.Keywords
               ln,
               pl
             ),
+        [ReturnKeywordToken.LexemeValue] =
+          (ap, ln, pl) =>
+            new ReturnKeywordToken(
+              ap,
+              ln,
+              pl
+            ),
 
         #endregion
 
