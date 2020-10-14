@@ -28,7 +28,7 @@ namespace ILangCompiler.Parser.AST.Declarations.Types
 
         private static ParseException NotAnArrayTypeException => new ParseException("Not an array type");
 
-        public static Either<ParseException, Pair<List<IToken>,ArrayTypeNode>> Parse(List<IToken> tokens, IScopedTable<IEntityType, string> parentTypeTable)
+        public static Either<ParseException, Pair<List<IToken>,ArrayTypeNode>> Parse(List<IToken> tokens, SymT symT, IScopedTable<IEntityType, string> parentTypeTable)
         {
             Console.WriteLine("ArrayTypeNode");
             if (tokens.Count < 2)
@@ -44,7 +44,7 @@ namespace ILangCompiler.Parser.AST.Declarations.Types
                 if (!(tokens[0] is RightBracketSymbolToken))
                     return NotAnArrayTypeException;
                 tokens = tokens.Skip(1).ToList();
-                var maybeType1 = TypeNode.Parse(tokens, parentTypeTable);
+                var maybeType1 = TypeNode.Parse(tokens, symT, parentTypeTable);
                 if (maybeType1.IsLeft)
                     return maybeType1.LeftToList()[0];
                 tokens = maybeType1.RightToList()[0].First;
@@ -65,7 +65,7 @@ namespace ILangCompiler.Parser.AST.Declarations.Types
             if (!(tokens[0] is RightBracketSymbolToken))
                 return NotAnArrayTypeException;
             tokens = tokens.Skip(1).ToList();
-            var maybeType2 = TypeNode.Parse(tokens, parentTypeTable);
+            var maybeType2 = TypeNode.Parse(tokens, symT, parentTypeTable);
             if (maybeType2.IsLeft)
                 return maybeType2.LeftToList()[0];
             tokens = maybeType2.RightToList()[0].First;

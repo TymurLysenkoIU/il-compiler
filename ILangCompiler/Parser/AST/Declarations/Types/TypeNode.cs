@@ -34,17 +34,18 @@ namespace ILangCompiler.Parser.AST.Declarations.Types
 
         private static ParseException NotATypeException => new ParseException("Not a type");
 
-
-        public static Either<ParseException, Pair<List<IToken>, TypeNode>> Parse(List<IToken> tokens, IScopedTable<IEntityType, string> parentTypeTable)
+        public static Either<ParseException, Pair<List<IToken>, TypeNode>> Parse(List<IToken> tokens, SymT symT, IScopedTable<IEntityType, string> parentTypeTable)
         {
             Console.WriteLine("TypeNode");
             var maybePrimitiveType = PrimitiveTypeNode.Parse(tokens);
             if (maybePrimitiveType.IsLeft)
             {
-                var maybeArrayType = ArrayTypeNode.Parse(tokens, parentTypeTable);
+                var maybeArrayType = ArrayTypeNode.Parse(tokens, symT, parentTypeTable);
                 if (maybeArrayType.IsLeft)
                 {
-                    var maybeRecordType = RecordTypeNode.Parse(tokens, parentTypeTable);
+                    SymT NewSymT = new SymT(symT);
+                    var maybeRecordType = RecordTypeNode.Parse(tokens, NewSymT, parentTypeTable);
+
                     if (maybeRecordType.IsLeft)
                     {
                         if (tokens.Count < 1)
@@ -52,6 +53,11 @@ namespace ILangCompiler.Parser.AST.Declarations.Types
                         if (!(tokens[0] is IdentifierToken))
                             return NotATypeException;
                         IdentifierToken identifier = (IdentifierToken) tokens[0];
+                        if (!(symT.ContainRec(identifier)))
+                        {
+                            // TODO: return an exception instead
+                            Console.Write("No such identifier");
+                        }
                         tokens = tokens.Skip(1).ToList();
                         return new Pair<List<IToken>, TypeNode> (tokens, new TypeNode(identifier));
 

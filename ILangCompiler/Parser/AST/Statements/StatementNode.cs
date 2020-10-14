@@ -54,7 +54,7 @@ namespace ILangCompiler.Parser.AST.Statements
         }
         private static ParseException NotAStatementException => new ParseException("Not a statement");
 
-        public static Either<ParseException, Pair<List<IToken>,StatementNode>> Parse(List<IToken> tokens, IScopedTable<IEntityType, string> parentTypeTable)
+        public static Either<ParseException, Pair<List<IToken>,StatementNode>> Parse(List<IToken> tokens, SymT symT, IScopedTable<IEntityType, string> parentTypeTable)
         {
             Console.WriteLine("StatementNode");
 
@@ -67,7 +67,7 @@ namespace ILangCompiler.Parser.AST.Statements
                         parentTypeTable));
             }
 
-            var maybeRoutineCall = RoutineCallNode.Parse(tokens, parentTypeTable);
+            var maybeRoutineCall = RoutineCallNode.Parse(tokens, symT, parentTypeTable);
             if (maybeRoutineCall.IsRight)
             {
                 tokens = maybeRoutineCall.RightToList()[0].First;
@@ -76,7 +76,7 @@ namespace ILangCompiler.Parser.AST.Statements
                     parentTypeTable));
             }
 
-            var maybeWhileLoop = WhileLoopNode.Parse(tokens, parentTypeTable);
+            var maybeWhileLoop = WhileLoopNode.Parse(tokens, symT, parentTypeTable);
             if (maybeWhileLoop.IsRight)
             {
                 tokens = maybeWhileLoop.RightToList()[0].First;
@@ -85,7 +85,7 @@ namespace ILangCompiler.Parser.AST.Statements
                     parentTypeTable));
             }
 
-            var maybeForLoop = ForLoopNode.Parse(tokens, parentTypeTable);
+            var maybeForLoop = ForLoopNode.Parse(tokens, symT, parentTypeTable);
             if (maybeForLoop.IsRight)
             {
                 tokens = maybeForLoop.RightToList()[0].First;
@@ -94,7 +94,7 @@ namespace ILangCompiler.Parser.AST.Statements
                     parentTypeTable));
             }
 
-            var maybeIfStatement = IfStatementNode.Parse(tokens, parentTypeTable);
+            var maybeIfStatement = IfStatementNode.Parse(tokens, symT, parentTypeTable);
             if (maybeIfStatement.IsRight)
             {
                 tokens = maybeIfStatement.RightToList()[0].First;

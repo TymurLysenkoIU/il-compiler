@@ -21,6 +21,7 @@ namespace ILangCompiler.Parser.AST.Declarations
     public ImmutableArray<ParameterNode> Parameters;
     public Option<TypeNode> ReturnType;
     public BodyNode Body;
+    public SymT SymbolTable;
 
     #region Type table
 
@@ -36,7 +37,7 @@ namespace ILangCompiler.Parser.AST.Declarations
 
     private static ParseException NotARoutineException => new ParseException("Not a routine");
 
-    private RoutineDeclarationNode(IdentifierToken identifier, IEnumerable<ParameterNode> parameters, Option<TypeNode> returnType, BodyNode body, IDictionary<string, IEntityType> scopeTypeTable, IScopedTable<IEntityType, string> parentTypeTable)
+    private RoutineDeclarationNode(IdentifierToken identifier, IEnumerable<ParameterNode> parameters, Option<TypeNode> returnType, BodyNode body, SymT symT, IDictionary<string, IEntityType> scopeTypeTable, IScopedTable<IEntityType, string> parentTypeTable)
     {
       Identifier = identifier;
       Parameters = parameters.ToImmutableArray();
@@ -44,6 +45,7 @@ namespace ILangCompiler.Parser.AST.Declarations
       Body = body;
       ScopeTypeTable = scopeTypeTable;
       ParentTypeTable = parentTypeTable;
+      SymbolTable = symT;
     }
 
     private RoutineDeclarationNode(IDictionary<string, IEntityType> scopeTypeTable, IScopedTable<IEntityType, string> parentTypeTable)
@@ -52,8 +54,10 @@ namespace ILangCompiler.Parser.AST.Declarations
       ParentTypeTable = parentTypeTable;
     }
 
-    public static Either<ParseException, Pair<List<IToken>,RoutineDeclarationNode>> Parse(List<IToken> tokens, IScopedTable<IEntityType, string> parentTypeTable)
+    public static Either<ParseException, Pair<List<IToken>,RoutineDeclarationNode>> Parse(List<IToken> tokens, SymT symT, IScopedTable<IEntityType, string> parentTypeTable)
     {
+      var NewSymT = new SymT(symT);
+
       Console.WriteLine("RoutineDeclarationNode");
       if (tokens.Count <= 3)
         return NotARoutineException;
@@ -78,7 +82,7 @@ namespace ILangCompiler.Parser.AST.Declarations
 
       while (true)
       {
-        var maybeParameter = ParameterNode.Parse(tokens, parentTypeTable);
+        var maybeParameter = ParameterNode.Parse(tokens, NewSymT, parentTypeTable);
 
         if (maybeParameter.IsLeft)
         {
@@ -118,7 +122,7 @@ namespace ILangCompiler.Parser.AST.Declarations
       if (tokens[0] is ColonSymbolToken)
       {
         tokens = tokens.Skip(1).ToList();
-        maybeType = TypeNode.Parse(tokens, parentTypeTable);
+        maybeType = TypeNode.Parse(tokens, symT, parentTypeTable);
         if (maybeType.IsLeft)
           return NotARoutineException;
         tokens = maybeType.RightToList()[0].First;
@@ -137,10 +141,11 @@ namespace ILangCompiler.Parser.AST.Declarations
         identifier, parameters,
         maybeType.Map<TypeNode>(pr => pr.Second).ToOption(),
         null,
+        NewSymT,
         typeTable,
         parentTypeTable
       );
-      var maybeBody = BodyNode.Parse(tokens, result);
+      var maybeBody = BodyNode.Parse(tokens, NewSymT, result);
       if (maybeBody.IsLeft)
       {
         return maybeBody.LeftToList()[0];

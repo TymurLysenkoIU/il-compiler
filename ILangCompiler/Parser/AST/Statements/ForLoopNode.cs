@@ -31,19 +31,25 @@ namespace ILangCompiler.Parser.AST.Statements
 
         #endregion
 
-        private ForLoopNode(IdentifierToken identifier, RangeNode range, BodyNode body, IDictionary<string, IEntityType> scopeTypeTable, IScopedTable<IEntityType, string> parentTypeTable)
+        public SymT SymbolTable;
+
+        private ForLoopNode(IdentifierToken identifier, RangeNode range, BodyNode body, SymT symT, IDictionary<string, IEntityType> scopeTypeTable, IScopedTable<IEntityType, string> parentTypeTable)
         {
             Identifier = identifier;
             Range = range;
             Body = body;
+            SymbolTable = symT;
             ScopeTypeTable = scopeTypeTable;
             ParentTypeTable = parentTypeTable;
         }
+
         private static ParseException NotAForLoopException => new ParseException("Not a for loop");
 
-        public static Either<ParseException, Pair<List<IToken>,ForLoopNode>> Parse(List<IToken> tokens, IScopedTable<IEntityType, string> parentTypeTable)
+        public static Either<ParseException, Pair<List<IToken>,ForLoopNode>> Parse(List<IToken> tokens, SymT symT, IScopedTable<IEntityType, string> parentTypeTable)
         {
             Console.WriteLine("ForLoopNode");
+            SymT NewSymT = new SymT(symT);
+
             if (tokens.Count < 1)
                 return NotAForLoopException;
             if (!(tokens[0] is ForKeywordToken))
@@ -63,8 +69,19 @@ namespace ILangCompiler.Parser.AST.Statements
             tokens = tokens.Skip(1).ToList();
 
             var result = new ForLoopNode(
-                identifier, null, null, typeTable, parentTypeTable);
+                identifier, null, null, NewSymT, typeTable, parentTypeTable);
             var maybeRange = RangeNode.Parse(tokens, result);
+
+            if (NewSymT.Contain(identifier))
+            {
+                // TODO: return an exception instead
+                Console.WriteLine("Repeating identifier in the same scope");
+            }
+            else
+            {
+                NewSymT.Add(identifier);
+            }
+
             if (maybeRange.IsLeft)
                 return maybeRange.LeftToList()[0];
             RangeNode range = maybeRange.RightToList()[0].Second;
@@ -76,7 +93,7 @@ namespace ILangCompiler.Parser.AST.Statements
                 return NotAForLoopException;
             tokens = tokens.Skip(1).ToList();
 
-            var maybeBody = BodyNode.Parse(tokens, result);
+            var maybeBody = BodyNode.Parse(tokens, NewSymT, result);
             if (maybeBody.IsLeft)
                 return maybeBody.LeftToList()[0];
             BodyNode body = maybeBody.RightToList()[0].Second;

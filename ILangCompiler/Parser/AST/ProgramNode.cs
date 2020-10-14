@@ -30,14 +30,19 @@ namespace ILangCompiler.Parser.AST
 
     #endregion
 
+    public SymT SymbolTable;
+
     private ProgramNode(
       IEnumerable<IDeclarationNode> declarations,
+      SymT symT,
       IDictionary<string, IEntityType> scopeTypeTable
     )
     {
       Declarations = declarations.ToList();
+      SymbolTable = symT;
       ScopeTypeTable = scopeTypeTable;
     }
+
 
     public static Either<ParseException, ProgramNode> Parse(List<IToken> tokens)
     {
@@ -45,12 +50,13 @@ namespace ILangCompiler.Parser.AST
 
       var declarations = new List<IDeclarationNode>();
       var typeTable = new Dictionary<string, IEntityType>();
+      var symT = new SymT();
 
-      var result = new ProgramNode(declarations, typeTable);
+      var result = new ProgramNode(declarations, symT, typeTable);
 
       while (tokens.Count > 0)
       {
-        var maybeRoutineDeclaration = RoutineDeclarationNode.Parse(tokens, result);
+        var maybeRoutineDeclaration = RoutineDeclarationNode.Parse(tokens, symT, result);
         if (maybeRoutineDeclaration.IsRight)
         {
           tokens = maybeRoutineDeclaration.RightToList()[0].First;
@@ -61,7 +67,7 @@ namespace ILangCompiler.Parser.AST
           continue;
         }
 
-        var maybeVariableDeclaration = VariableDeclarationNode.Parse(tokens, result);
+        var maybeVariableDeclaration = VariableDeclarationNode.Parse(tokens, symT, result);
         if (maybeVariableDeclaration.IsRight)
         {
           tokens = maybeVariableDeclaration.RightToList()[0].First;
@@ -71,7 +77,7 @@ namespace ILangCompiler.Parser.AST
           continue;
         }
 
-        var maybeTypeDeclaration = TypeDeclarationNode.Parse(tokens, result);
+        var maybeTypeDeclaration = TypeDeclarationNode.Parse(tokens, symT, result);
         if (maybeTypeDeclaration.IsRight)
         {
           tokens = maybeTypeDeclaration.RightToList()[0].First;
@@ -85,7 +91,7 @@ namespace ILangCompiler.Parser.AST
       }
 
       Console.WriteLine("Program is interprited Successfully");
-      return new ProgramNode(declarations, typeTable);
+      return new ProgramNode(declarations, symT, typeTable);
       //return Either<ParseException, ProgramNode>.Bottom;
     }
   }

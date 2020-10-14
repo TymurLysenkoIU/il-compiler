@@ -25,7 +25,7 @@ namespace ILangCompiler.Parser.AST.Statements
         }
         private static ParseException NotAnIfStatementException => new ParseException("Not an if statement");
 
-        public static Either<ParseException, Pair<List<IToken>,IfStatementNode>> Parse(List<IToken> tokens, IScopedTable<IEntityType, string> parentTypeTable)
+        public static Either<ParseException, Pair<List<IToken>,IfStatementNode>> Parse(List<IToken> tokens, SymT symT, IScopedTable<IEntityType, string> parentTypeTable)
         {
             Console.WriteLine("IfStatementNode");
             if (tokens.Count < 1)
@@ -45,7 +45,7 @@ namespace ILangCompiler.Parser.AST.Statements
                 return NotAnIfStatementException;
             tokens = tokens.Skip(1).ToList();
 
-            var maybeBody1 = BodyNode.Parse(tokens, parentTypeTable);
+            var maybeBody1 = BodyNode.Parse(tokens, symT, parentTypeTable);
             if (maybeBody1.IsLeft)
                 return NotAnIfStatementException;
             tokens = maybeBody1.RightToList()[0].First;
@@ -57,7 +57,8 @@ namespace ILangCompiler.Parser.AST.Statements
             {
                 tokens = tokens.Skip(1).ToList();
 
-                maybeBody2 = BodyNode.Parse(tokens, parentTypeTable);
+                maybeBody2 = BodyNode.Parse(tokens, symT, parentTypeTable);
+
                 if (maybeBody2.IsLeft)
                     return NotAnIfStatementException;
                 tokens = maybeBody2.RightToList()[0].First;

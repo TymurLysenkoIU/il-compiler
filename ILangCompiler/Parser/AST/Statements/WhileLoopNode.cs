@@ -16,14 +16,16 @@ namespace ILangCompiler.Parser.AST.Statements
     {
         public ExpressionNode Expression;
         public BodyNode Body;
-        private WhileLoopNode(ExpressionNode expression, BodyNode body)
+        public SymT SymbolTable;
+        private WhileLoopNode(ExpressionNode expression, BodyNode body, SymT symT)
         {
             Expression = expression;
             Body = body;
+            SymbolTable = symT;
         }
         private static ParseException NotAWhileException => new ParseException("Not a while");
 
-        public static Either<ParseException, Pair<List<IToken>,WhileLoopNode>> Parse(List<IToken> tokens, IScopedTable<IEntityType, string> parentTypeTable)
+        public static Either<ParseException, Pair<List<IToken>,WhileLoopNode>> Parse(List<IToken> tokens, SymT symT, IScopedTable<IEntityType, string> parentTypeTable)
         {
             Console.WriteLine("WhileLoopNode");
             if (tokens.Count < 1)
@@ -43,7 +45,9 @@ namespace ILangCompiler.Parser.AST.Statements
                 return NotAWhileException;
             tokens = tokens.Skip(1).ToList();
 
-            var maybeBody = BodyNode.Parse(tokens, parentTypeTable);
+            SymT NewSymT = new SymT(symT);
+            var maybeBody = BodyNode.Parse(tokens, NewSymT, parentTypeTable);
+
             if (maybeBody.IsLeft)
                 return NotAWhileException;
             tokens = maybeBody.RightToList()[0].First;
@@ -61,7 +65,7 @@ namespace ILangCompiler.Parser.AST.Statements
                 else break;
 
             return new Pair<List<IToken>,WhileLoopNode>(tokens, new WhileLoopNode(
-                maybeExpression.RightToList()[0].Second,maybeBody.RightToList()[0].Second));
+                maybeExpression.RightToList()[0].Second,maybeBody.RightToList()[0].Second, NewSymT));
         }
 
     }

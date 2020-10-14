@@ -50,7 +50,7 @@ namespace ILangCompiler.Parser.AST
 
         private static ParseException NotABodyException => new ParseException("Not a body");
 
-        public static Either<ParseException, Pair<List<IToken>,BodyNode>> Parse(List<IToken> tokens, IScopedTable<IEntityType, string> parentTypeTable)
+        public static Either<ParseException, Pair<List<IToken>,BodyNode>> Parse(List<IToken> tokens, SymT symT, IScopedTable<IEntityType, string> parentTypeTable)
         {
             Console.WriteLine("BodyNode");
 
@@ -66,7 +66,7 @@ namespace ILangCompiler.Parser.AST
 
             while (true)
             {
-                var maybeSimpleDeclaration1 = VariableDeclarationNode.Parse(tokens, result);
+                var maybeSimpleDeclaration1 = VariableDeclarationNode.Parse(tokens, symT, result);
                 if (maybeSimpleDeclaration1.IsRight)
                 {
                     tokens = maybeSimpleDeclaration1.RightToList()[0].First;
@@ -81,7 +81,7 @@ namespace ILangCompiler.Parser.AST
                     continue;
                 }
 
-                var maybeSimpleDeclaration2 = TypeDeclarationNode.Parse(tokens, result);
+                var maybeSimpleDeclaration2 = TypeDeclarationNode.Parse(tokens, symT, result);
                 if (maybeSimpleDeclaration2.IsRight)
                 {
                     tokens = maybeSimpleDeclaration2.RightToList()[0].First;
@@ -96,7 +96,7 @@ namespace ILangCompiler.Parser.AST
                     continue;
                 }
 
-                var maybeStatement = StatementNode.Parse(tokens, result);
+                var maybeStatement = StatementNode.Parse(tokens, symT, result);
                 if (maybeStatement.IsRight)
                 {
                     tokens = maybeStatement.RightToList()[0].First;
@@ -109,7 +109,7 @@ namespace ILangCompiler.Parser.AST
                     continue;
                 }
 
-                var maybeExpression = StatementNode.Parse(tokens, result);
+                var maybeExpression = StatementNode.Parse(tokens, symT, result);
                 if (maybeExpression.IsRight)
                 {
                     tokens = maybeExpression.RightToList()[0].First;

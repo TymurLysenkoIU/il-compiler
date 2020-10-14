@@ -36,7 +36,7 @@ namespace ILangCompiler.Parser.AST.Declarations.Types
 
         private static ParseException NotATypeDeclarationException => new ParseException("Not a type declaration");
 
-        public static Either<ParseException, Pair<List<IToken>,TypeDeclarationNode>> Parse(List<IToken> tokens, IScopedTable<IEntityType, string> parentTypeTable)
+        public static Either<ParseException, Pair<List<IToken>,TypeDeclarationNode>> Parse(List<IToken> tokens, SymT symT, IScopedTable<IEntityType, string> parentTypeTable)
         {
             Console.WriteLine("TypeDeclarationNode");
             if (tokens.Count < 3)
@@ -50,7 +50,7 @@ namespace ILangCompiler.Parser.AST.Declarations.Types
             IdentifierToken identifier = (IdentifierToken) tokens[1];
             tokens = tokens.Skip(3).ToList();
 
-            var maybeType = TypeNode.Parse(tokens, parentTypeTable);
+            var maybeType = TypeNode.Parse(tokens, symT, parentTypeTable);
             if (maybeType.IsLeft)
                 return maybeType.LeftToList()[0];
             tokens = maybeType.RightToList()[0].First;
@@ -59,6 +59,17 @@ namespace ILangCompiler.Parser.AST.Declarations.Types
                     tokens[0] is SemicolonSymbolToken)
                     tokens = tokens.Skip(1).ToList();
                 else break;
+
+            if (symT.Contain(identifier))
+            {
+                // TODO: return an exception instead
+
+                Console.WriteLine("Repeating identifier in the same scope");
+            }
+            else
+            {
+                symT.Add(identifier);
+            }
 
             return new Pair<List<IToken>, TypeDeclarationNode>(tokens, new TypeDeclarationNode(
                 identifier, maybeType.RightToList()[0].Second, parentTypeTable));

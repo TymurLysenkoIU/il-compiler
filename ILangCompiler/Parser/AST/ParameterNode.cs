@@ -26,7 +26,7 @@ namespace ILangCompiler.Parser.AST
             Type = type;
         }
 
-        public static Either<ParseException, Pair<List<IToken>, ParameterNode>> Parse(List<IToken> tokens, IScopedTable<IEntityType, string> parentTypeTable)
+        public static Either<ParseException, Pair<List<IToken>, ParameterNode>> Parse(List<IToken> tokens, SymT symT, IScopedTable<IEntityType, string> parentTypeTable)
         {
             Console.WriteLine("ParameterNode");
             if (tokens.Count < 3)
@@ -47,7 +47,7 @@ namespace ILangCompiler.Parser.AST
 
             tokens = tokens.Skip(1).ToList();
 
-            var maybeType = TypeNode.Parse(tokens, parentTypeTable);
+            var maybeType = TypeNode.Parse(tokens, symT, parentTypeTable);
 
             if (maybeType.IsLeft)
             {
