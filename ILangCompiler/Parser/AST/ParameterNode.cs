@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using ILangCompiler.Parser.AST.Declarations;
 using ILangCompiler.Parser.AST.Declarations.Types;
+using ILangCompiler.Parser.AST.TypeTable;
 using ILangCompiler.Parser.Exceptions;
 using ILangCompiler.Scanner.Tokens;
 using ILangCompiler.Scanner.Tokens.Predefined.Keywords.Declaration;
@@ -13,7 +14,7 @@ namespace ILangCompiler.Parser.AST
 {
     public class ParameterNode : IAstNode
     {
-        
+
         public IdentifierToken Name;
         public ITypeNode Type;
 
@@ -25,7 +26,7 @@ namespace ILangCompiler.Parser.AST
             Type = type;
         }
 
-        public static Either<ParseException, Pair<List<IToken>, ParameterNode>> Parse(List<IToken> tokens)
+        public static Either<ParseException, Pair<List<IToken>, ParameterNode>> Parse(List<IToken> tokens, IScopedTable<IEntityType, string> parentTypeTable)
         {
             Console.WriteLine("ParameterNode");
             if (tokens.Count < 3)
@@ -38,7 +39,7 @@ namespace ILangCompiler.Parser.AST
 
             IdentifierToken name = (IdentifierToken) tokens[0];
             tokens = tokens.Skip(1).ToList();
-            
+
             if (!(tokens[0] is IsKeywordToken))
             {
                 return NotAParameterException;
@@ -46,7 +47,7 @@ namespace ILangCompiler.Parser.AST
 
             tokens = tokens.Skip(1).ToList();
 
-            var maybeType = TypeNode.Parse(tokens);
+            var maybeType = TypeNode.Parse(tokens, parentTypeTable);
 
             if (maybeType.IsLeft)
             {

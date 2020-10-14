@@ -12,7 +12,7 @@ namespace ILangCompiler.Parser.AST.Declarations.Types.PrimitiveTypes
 {
     public class IntegerTypeNode : PrimitiveTypeNode, IPrimitiveTypeNode
     {
-        private IntegerTypeNode()
+        public IntegerTypeNode()
         {
 
         }

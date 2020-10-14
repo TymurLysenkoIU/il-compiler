@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using ILangCompiler.Parser.AST.Expressions;
+using ILangCompiler.Parser.AST.TypeTable;
 using ILangCompiler.Parser.Exceptions;
 using ILangCompiler.Scanner.Tokens;
 using ILangCompiler.Scanner.Tokens.Predefined.Keywords;
@@ -22,7 +23,7 @@ namespace ILangCompiler.Parser.AST.Statements
         }
         private static ParseException NotAWhileException => new ParseException("Not a while");
 
-        public static Either<ParseException, Pair<List<IToken>,WhileLoopNode>> Parse(List<IToken> tokens)
+        public static Either<ParseException, Pair<List<IToken>,WhileLoopNode>> Parse(List<IToken> tokens, IScopedTable<IEntityType, string> parentTypeTable)
         {
             Console.WriteLine("WhileLoopNode");
             if (tokens.Count < 1)
@@ -31,22 +32,22 @@ namespace ILangCompiler.Parser.AST.Statements
                 return NotAWhileException;
             tokens = tokens.Skip(1).ToList();
 
-            var maybeExpression = ExpressionNode.Parse(tokens);
+            var maybeExpression = ExpressionNode.Parse(tokens, parentTypeTable);
             if (maybeExpression.IsLeft)
                 return NotAWhileException;
             tokens = maybeExpression.RightToList()[0].First;
-            
+
             if (tokens.Count < 1)
                 return NotAWhileException;
             if (!(tokens[0] is LoopKeywordToken))
                 return NotAWhileException;
             tokens = tokens.Skip(1).ToList();
-            
-            var maybeBody = BodyNode.Parse(tokens);
+
+            var maybeBody = BodyNode.Parse(tokens, parentTypeTable);
             if (maybeBody.IsLeft)
                 return NotAWhileException;
             tokens = maybeBody.RightToList()[0].First;
-            
+
             if (tokens.Count < 1)
                 return NotAWhileException;
             if (!(tokens[0] is EndKeywordToken))

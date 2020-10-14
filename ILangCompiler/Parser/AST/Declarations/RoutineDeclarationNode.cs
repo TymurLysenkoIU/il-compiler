@@ -2,8 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using System.Runtime.InteropServices;
 using ILangCompiler.Parser.AST.Declarations.Types;
+using ILangCompiler.Parser.AST.TypeTable;
+using ILangCompiler.Parser.AST.TypeTable.TypeRepresentation;
 using ILangCompiler.Parser.Exceptions;
 using ILangCompiler.Scanner.Tokens;
 using ILangCompiler.Scanner.Tokens.Predefined.Keywords;
@@ -14,28 +15,44 @@ using static LanguageExt.Prelude;
 
 namespace ILangCompiler.Parser.AST.Declarations
 {
-  public class RoutineDeclarationNode : IDeclarationNode
+  public class RoutineDeclarationNode : IDeclarationNode, ITypeTable<IEntityType>
   {
     public IdentifierToken Identifier;
     public ImmutableArray<ParameterNode> Parameters;
     public Option<TypeNode> ReturnType;
     public BodyNode Body;
 
+    #region Type table
+
+    private readonly IDictionary<string, IEntityType> ScopeTypeTable;
+    private readonly IScopedTable<IEntityType, string> ParentTypeTable;
+
+    IDictionary<string, IEntityType> IScopedTable<IEntityType, string>.Table => ScopeTypeTable;
+
+    Option<IScopedTable<IEntityType, string>> IScopedTable<IEntityType, string>.ParentTable => Some(ParentTypeTable);
+
+    #endregion
+
+
     private static ParseException NotARoutineException => new ParseException("Not a routine");
 
-    private RoutineDeclarationNode(IdentifierToken identifier, IEnumerable<ParameterNode> parameters, Option<TypeNode> returnType, BodyNode body)
+    private RoutineDeclarationNode(IdentifierToken identifier, IEnumerable<ParameterNode> parameters, Option<TypeNode> returnType, BodyNode body, IDictionary<string, IEntityType> scopeTypeTable, IScopedTable<IEntityType, string> parentTypeTable)
     {
       Identifier = identifier;
       Parameters = parameters.ToImmutableArray();
       ReturnType = returnType;
       Body = body;
+      ScopeTypeTable = scopeTypeTable;
+      ParentTypeTable = parentTypeTable;
     }
 
-    private RoutineDeclarationNode()
+    private RoutineDeclarationNode(IDictionary<string, IEntityType> scopeTypeTable, IScopedTable<IEntityType, string> parentTypeTable)
     {
+      ScopeTypeTable = scopeTypeTable;
+      ParentTypeTable = parentTypeTable;
     }
 
-    public static Either<ParseException, Pair<List<IToken>,RoutineDeclarationNode>> Parse(List<IToken> tokens)
+    public static Either<ParseException, Pair<List<IToken>,RoutineDeclarationNode>> Parse(List<IToken> tokens, IScopedTable<IEntityType, string> parentTypeTable)
     {
       Console.WriteLine("RoutineDeclarationNode");
       if (tokens.Count <= 3)
@@ -57,15 +74,20 @@ namespace ILangCompiler.Parser.AST.Declarations
       tokens = tokens.Skip(3).ToList();
 
       var parameters = new List<ParameterNode>();
+      var typeTable = new Dictionary<string, IEntityType>();
+
       while (true)
       {
-        var maybeParameter = ParameterNode.Parse(tokens);
+        var maybeParameter = ParameterNode.Parse(tokens, parentTypeTable);
 
         if (maybeParameter.IsLeft)
         {
           break;
         }
-        parameters.Add(maybeParameter.RightToList()[0].Second);
+
+        var parameter = maybeParameter.RightToList()[0].Second;
+        parameters.Add(parameter);
+        typeTable.Add(parameter.Name.Lexeme, new VariableType(parameter.Type.ToTypeRepresentation()));
         tokens = maybeParameter.RightToList()[0].First;
 
         if (tokens.Count < 1)
@@ -96,7 +118,7 @@ namespace ILangCompiler.Parser.AST.Declarations
       if (tokens[0] is ColonSymbolToken)
       {
         tokens = tokens.Skip(1).ToList();
-        maybeType = TypeNode.Parse(tokens);
+        maybeType = TypeNode.Parse(tokens, parentTypeTable);
         if (maybeType.IsLeft)
           return NotARoutineException;
         tokens = maybeType.RightToList()[0].First;
@@ -111,14 +133,21 @@ namespace ILangCompiler.Parser.AST.Declarations
 
       tokens = tokens.Skip(1).ToList();
 
-      var maybeBody = BodyNode.Parse(tokens);
+      var result = new RoutineDeclarationNode(
+        identifier, parameters,
+        maybeType.Map<TypeNode>(pr => pr.Second).ToOption(),
+        null,
+        typeTable,
+        parentTypeTable
+      );
+      var maybeBody = BodyNode.Parse(tokens, result);
       if (maybeBody.IsLeft)
       {
         return maybeBody.LeftToList()[0];
       }
 
       tokens = maybeBody.RightToList()[0].First;
-      
+
       if (tokens.Count < 1)
         return NotARoutineException;
       if (!(tokens[0] is EndKeywordToken))
@@ -126,19 +155,17 @@ namespace ILangCompiler.Parser.AST.Declarations
         return NotARoutineException;
       }
 
-      
+
       tokens = tokens.Skip(1).ToList();
-      
+
       while (tokens.Count > 0)
-        if (tokens[0] is NewLineSymbolToken || tokens[0] is CommentToken|| 
+        if (tokens[0] is NewLineSymbolToken || tokens[0] is CommentToken||
             tokens[0] is SemicolonSymbolToken)
           tokens = tokens.Skip(1).ToList();
         else break;
-      
-      return new Pair<List<IToken>, RoutineDeclarationNode>(tokens, new RoutineDeclarationNode(
-        identifier, parameters, maybeType.Map<TypeNode>(pr => pr.Second).ToOption(),
-        maybeBody.RightToList()[0].Second));
-    
+
+      result.Body = maybeBody.RightToList()[0].Second;
+      return new Pair<List<IToken>, RoutineDeclarationNode>(tokens, result);
     }
   }
 }

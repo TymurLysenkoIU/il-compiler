@@ -21,6 +21,7 @@ namespace ILangCompiler.Parser.AST
     public List<IDeclarationNode> Declarations;
 
     #region Type table
+
     private readonly IDictionary<string, IEntityType> ScopeTypeTable;
 
     IDictionary<string, IEntityType> IScopedTable<IEntityType, string>.Table => ScopeTypeTable;
@@ -45,10 +46,11 @@ namespace ILangCompiler.Parser.AST
       var declarations = new List<IDeclarationNode>();
       var typeTable = new Dictionary<string, IEntityType>();
 
+      var result = new ProgramNode(declarations, typeTable);
 
       while (tokens.Count > 0)
       {
-        var maybeRoutineDeclaration = RoutineDeclarationNode.Parse(tokens);
+        var maybeRoutineDeclaration = RoutineDeclarationNode.Parse(tokens, result);
         if (maybeRoutineDeclaration.IsRight)
         {
           tokens = maybeRoutineDeclaration.RightToList()[0].First;
@@ -59,7 +61,7 @@ namespace ILangCompiler.Parser.AST
           continue;
         }
 
-        var maybeVariableDeclaration = VariableDeclarationNode.Parse(tokens);
+        var maybeVariableDeclaration = VariableDeclarationNode.Parse(tokens, result);
         if (maybeVariableDeclaration.IsRight)
         {
           tokens = maybeVariableDeclaration.RightToList()[0].First;
@@ -69,7 +71,7 @@ namespace ILangCompiler.Parser.AST
           continue;
         }
 
-        var maybeTypeDeclaration = TypeDeclarationNode.Parse(tokens);
+        var maybeTypeDeclaration = TypeDeclarationNode.Parse(tokens, result);
         if (maybeTypeDeclaration.IsRight)
         {
           tokens = maybeTypeDeclaration.RightToList()[0].First;

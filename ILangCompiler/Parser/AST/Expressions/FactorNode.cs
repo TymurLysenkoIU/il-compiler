@@ -1,33 +1,47 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using ILangCompiler.Parser.AST.TypeTable;
 using ILangCompiler.Parser.Exceptions;
 using ILangCompiler.Scanner.Tokens;
 using ILangCompiler.Scanner.Tokens.Predefined.Operators;
 using ILangCompiler.Scanner.Tokens.Predefined.Symbols;
 using LanguageExt;
+using static LanguageExt.Prelude;
 
 namespace ILangCompiler.Parser.AST.Expressions
 {
-    public class FactorNode: IAstNode
+    public class FactorNode: IAstNode, ITypeTable<IEntityType>
     {
         private SummandNode Summand;
         private List<IToken> Tokens;
         private List<SummandNode> Summands;
 
-        private FactorNode(SummandNode summand, List<IToken> tokens, List<SummandNode> summands)
+        #region Type table
+
+        private IDictionary<string, IEntityType> ScopeTypeTable = new Dictionary<string, IEntityType>();
+        private readonly IScopedTable<IEntityType, string> ParentTypeTable;
+
+        IDictionary<string, IEntityType> IScopedTable<IEntityType, string>.Table => ScopeTypeTable;
+
+        Option<IScopedTable<IEntityType, string>> IScopedTable<IEntityType, string>.ParentTable => Some(ParentTypeTable);
+
+        #endregion
+
+        private FactorNode(SummandNode summand, List<IToken> tokens, List<SummandNode> summands, IScopedTable<IEntityType, string> parentTypeTable)
         {
             Summand = summand;
             Tokens = tokens;
             Summands = summands;
+            ParentTypeTable = parentTypeTable;
         }
 
         private static ParseException NotAFactorException => new ParseException("Not a factor");
 
-        public static Either<ParseException, Pair<List<IToken>,FactorNode>> Parse(List<IToken> tokens)
+        public static Either<ParseException, Pair<List<IToken>,FactorNode>> Parse(List<IToken> tokens, IScopedTable<IEntityType, string> parentTypeTable)
         {
             Console.WriteLine("FactorNode");
-            var maybeSummand = SummandNode.Parse(tokens);
+            var maybeSummand = SummandNode.Parse(tokens, parentTypeTable);
             if (maybeSummand.IsLeft)
                 return maybeSummand.LeftToList()[0];
             var summand = maybeSummand.RightToList()[0].Second;
@@ -46,7 +60,7 @@ namespace ILangCompiler.Parser.AST.Expressions
                     break;
                 tokenlist.Add(tokens[0]);
                 tokens = tokens.Skip(1).ToList();
-                var maybeSummand2 = SummandNode.Parse(tokens);
+                var maybeSummand2 = SummandNode.Parse(tokens, parentTypeTable);
                 if (maybeSummand2.IsLeft)
                     return maybeSummand2.LeftToList()[0];
                 tokens = maybeSummand2.RightToList()[0].First;
@@ -61,7 +75,7 @@ namespace ILangCompiler.Parser.AST.Expressions
                 if (tokens[0] is NewLineSymbolToken || tokens[0] is CommentToken)
                     tokens = tokens.Skip(1).ToList();
                 else break;
-            return new Pair<List<IToken>,FactorNode>(tokens, new FactorNode(summand,tokenlist,summands));
+            return new Pair<List<IToken>,FactorNode>(tokens, new FactorNode(summand,tokenlist,summands, parentTypeTable));
         }
     }
 }

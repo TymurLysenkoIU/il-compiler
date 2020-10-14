@@ -22,17 +22,22 @@ namespace ILangCompiler.Parser.AST.TypeTable.TypeRepresentation
         {
             if (typeNode.PrimitiveType != null)
             {
-                return ((ITypeNode) typeNode.PrimitiveType).ToTypeRepresentation();
+                return new PrimitiveTypeRepresentation(typeNode.PrimitiveType);
             }
 
             if (typeNode.ArrayType != null)
             {
-                return typeNode.ArrayType.ToTypeRepresentation();
+                return new ArrayTypeRepresentation(typeNode.ArrayType.Type.ToTypeRepresentation());
             }
 
             if (typeNode.Record != null)
             {
-                return typeNode.Record.ToTypeRepresentation();
+                return new RecordTypeRepresentation(
+                    typeNode.Record.VariableDeclarations.ToDictionary(
+                        node => node.Identifier.Lexeme,
+                        node => node.ToTypeRepresentation()
+                    )
+                );
             }
 
             if (typeNode.Identifier != null)
