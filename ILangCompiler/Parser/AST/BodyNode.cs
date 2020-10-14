@@ -22,7 +22,7 @@ namespace ILangCompiler.Parser.AST
 
         private static ParseException NotABodyException => new ParseException("Not a body");
 
-        public static Either<ParseException, Pair<List<IToken>,BodyNode>> Parse(List<IToken> tokens)
+        public static Either<ParseException, Pair<List<IToken>,BodyNode>> Parse(List<IToken> tokens, SymT symT)
         {
             Console.WriteLine("BodyNode");
             
@@ -36,7 +36,7 @@ namespace ILangCompiler.Parser.AST
             
             while (true)
             {
-                var maybeSimpleDeclaration1 = VariableDeclarationNode.Parse(tokens);
+                var maybeSimpleDeclaration1 = VariableDeclarationNode.Parse(tokens, symT);
                 if (maybeSimpleDeclaration1.IsRight)
                 {
                     tokens = maybeSimpleDeclaration1.RightToList()[0].First;
@@ -49,7 +49,7 @@ namespace ILangCompiler.Parser.AST
                     continue;
                 }
 
-                var maybeSimpleDeclaration2 = TypeDeclarationNode.Parse(tokens);
+                var maybeSimpleDeclaration2 = TypeDeclarationNode.Parse(tokens, symT);
                 if (maybeSimpleDeclaration2.IsRight)
                 {
                     tokens = maybeSimpleDeclaration2.RightToList()[0].First;
@@ -62,7 +62,7 @@ namespace ILangCompiler.Parser.AST
                     continue;
                 }
 
-                var maybeStatement = StatementNode.Parse(tokens);
+                var maybeStatement = StatementNode.Parse(tokens, symT);
                 if (maybeStatement.IsRight)
                 {
                     tokens = maybeStatement.RightToList()[0].First;

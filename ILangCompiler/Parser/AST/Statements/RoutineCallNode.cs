@@ -20,7 +20,7 @@ namespace ILangCompiler.Parser.AST.Statements
         }
         private static ParseException NotARoutineCallException => new ParseException("Not a routine call");
 
-        public static Either<ParseException, Pair<List<IToken>,RoutineCallNode>> Parse(List<IToken> tokens)
+        public static Either<ParseException, Pair<List<IToken>,RoutineCallNode>> Parse(List<IToken> tokens, SymT symT)
         {
             ImmutableArray<ExpressionNode> expressions = new ImmutableArray<ExpressionNode>();
             Console.WriteLine("RoutineCallNode");
@@ -76,7 +76,12 @@ namespace ILangCompiler.Parser.AST.Statements
                 if (tokens[0] is NewLineSymbolToken || tokens[0] is CommentToken)
                     tokens = tokens.Skip(1).ToList();
                 else break;
-            
+
+            if (!(symT.ContainRec(identifier)))
+            {
+                Console.Write("Such routine does not exist");
+            }
+
             return new Pair<List<IToken>,RoutineCallNode> (tokens, new RoutineCallNode(
                 expressions));
         }

@@ -25,7 +25,7 @@ namespace ILangCompiler.Parser.AST
             Type = type;
         }
 
-        public static Either<ParseException, Pair<List<IToken>, ParameterNode>> Parse(List<IToken> tokens)
+        public static Either<ParseException, Pair<List<IToken>, ParameterNode>> Parse(List<IToken> tokens, SymT symT)
         {
             Console.WriteLine("ParameterNode");
             if (tokens.Count < 3)
@@ -46,7 +46,7 @@ namespace ILangCompiler.Parser.AST
 
             tokens = tokens.Skip(1).ToList();
 
-            var maybeType = TypeNode.Parse(tokens);
+            var maybeType = TypeNode.Parse(tokens, symT);
 
             if (maybeType.IsLeft)
             {

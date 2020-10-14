@@ -9,28 +9,32 @@ using ILangCompiler.Parser.Exceptions;
 using ILangCompiler.Scanner.Tokens;
 using ILangCompiler.Scanner.Tokens.Predefined.Keywords.Declaration;
 using LanguageExt;
+using LanguageExt.ClassInstances.Pred;
 
 namespace ILangCompiler.Parser.AST
 {
   public class ProgramNode : IAstNode
   {
     public List<IDeclarationNode> Declarations;
-
-    private ProgramNode(IEnumerable<IDeclarationNode> declarations)
+    public SymT SymbolTable;
+    
+    private ProgramNode(IEnumerable <IDeclarationNode> declarations, SymT symT)
     {
       Declarations = declarations.ToList();
+      SymbolTable = symT;
     }
+    
 
     public static Either<ParseException, ProgramNode> Parse(List<IToken> tokens)
     {
       Console.WriteLine("ProgramNode");
       
       var declarations = new List<IDeclarationNode>();
-
+      var symT = new SymT();
       
       while (tokens.Count > 0)
       {
-        var maybeRoutineDeclaration = RoutineDeclarationNode.Parse(tokens);
+        var maybeRoutineDeclaration = RoutineDeclarationNode.Parse(tokens, symT);
         if (maybeRoutineDeclaration.IsRight)
         {
           tokens = maybeRoutineDeclaration.RightToList()[0].First;
@@ -38,7 +42,7 @@ namespace ILangCompiler.Parser.AST
           continue;
         }
 
-        var maybeVariableDeclaration = VariableDeclarationNode.Parse(tokens);
+        var maybeVariableDeclaration = VariableDeclarationNode.Parse(tokens, symT);
         if (maybeVariableDeclaration.IsRight)
         {
           tokens = maybeVariableDeclaration.RightToList()[0].First;
@@ -46,7 +50,7 @@ namespace ILangCompiler.Parser.AST
           continue;
         }
 
-        var maybeTypeDeclaration = TypeDeclarationNode.Parse(tokens);
+        var maybeTypeDeclaration = TypeDeclarationNode.Parse(tokens, symT);
         if (maybeTypeDeclaration.IsRight)
         {
           tokens = maybeTypeDeclaration.RightToList()[0].First;
@@ -56,9 +60,9 @@ namespace ILangCompiler.Parser.AST
 
         return maybeTypeDeclaration.LeftToList()[0];
       }
-
+      
       Console.WriteLine("Program is interprited Successfully");
-      return new ProgramNode(declarations);
+      return new ProgramNode(declarations, symT);
       //return Either<ParseException, ProgramNode>.Bottom;
     }
   }

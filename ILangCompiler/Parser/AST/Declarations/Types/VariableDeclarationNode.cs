@@ -25,7 +25,7 @@ namespace ILangCompiler.Parser.AST.Declarations.Types
             Expression = expression;
         }
 
-        public static Either<ParseException, Pair<List<IToken>, VariableDeclarationNode>> Parse(List<IToken> tokens)
+        public static Either<ParseException, Pair<List<IToken>, VariableDeclarationNode>> Parse(List<IToken> tokens, SymT symT)
         {
             Console.WriteLine("VariableDeclarationNode");
             if (tokens.Count < 3)
@@ -61,6 +61,15 @@ namespace ILangCompiler.Parser.AST.Declarations.Types
                     return maybeExpression.LeftToList()[0];
                 tokens = maybeExpression.RightToList()[0].First;
                 
+                if (symT.Contain(identifier))
+                {
+                    Console.WriteLine("Repeating identifier in the same scope");
+                }
+                else
+                {
+                    symT.Add(identifier);
+                }
+                
                 return new Pair<List<IToken>, VariableDeclarationNode>(tokens, new VariableDeclarationNode(
                     identifier, Option<TypeNode>.None, maybeExpression.RightToList()[0].Second));
                 //return new VariableDeclarationNode(identifier, Option<TypeNode>.None, maybeExpression);
@@ -75,7 +84,7 @@ namespace ILangCompiler.Parser.AST.Declarations.Types
                         tokens = tokens.Skip(1).ToList();
                     else break;
 
-                var maybeType = TypeNode.Parse(tokens);
+                var maybeType = TypeNode.Parse(tokens, symT);
                 if (maybeType.IsLeft)
                     return maybeType.LeftToList()[0];
                 tokens = maybeType.RightToList()[0].First;
@@ -83,12 +92,21 @@ namespace ILangCompiler.Parser.AST.Declarations.Types
                     if (tokens[0] is NewLineSymbolToken || tokens[0] is CommentToken)
                         tokens = tokens.Skip(1).ToList();
                     else break;
-                
+
                 if (!(tokens[0] is IsKeywordToken))
+                {
+                    if (symT.Contain(identifier))
+                    {
+                        Console.WriteLine("Repeating identifier in the same scope");
+                    }
+                    else
+                    {
+                        symT.Add(identifier);
+                    }
                     return new Pair<List<IToken>, VariableDeclarationNode>(tokens, new VariableDeclarationNode(
                         identifier, maybeType.RightToList()[0].Second, Option<ExpressionNode>.None));
-                
-                
+                }
+
                 tokens = tokens.Skip(1).ToList();
 
                 while (tokens.Count > 0)
@@ -102,6 +120,16 @@ namespace ILangCompiler.Parser.AST.Declarations.Types
                 if (maybeExpression.IsLeft)
                     return maybeExpression.LeftToList()[0];
                 tokens = maybeExpression.RightToList()[0].First;
+                
+                if (symT.Contain(identifier))
+                {
+                    Console.WriteLine("Repeating identifier in the same scope");
+                }
+                else
+                {
+                    symT.Add(identifier);
+                }
+                
                 return new Pair<List<IToken>, VariableDeclarationNode>(tokens, new VariableDeclarationNode(
                     identifier, maybeType.RightToList()[0].Second, maybeExpression.RightToList()[0].Second));
             }

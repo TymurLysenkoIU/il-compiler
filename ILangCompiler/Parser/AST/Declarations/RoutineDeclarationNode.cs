@@ -20,23 +20,28 @@ namespace ILangCompiler.Parser.AST.Declarations
     public ImmutableArray<ParameterNode> Parameters;
     public Option<TypeNode> ReturnType;
     public BodyNode Body;
+    public SymT SymbolTable;
 
     private static ParseException NotARoutineException => new ParseException("Not a routine");
 
-    private RoutineDeclarationNode(IdentifierToken identifier, IEnumerable<ParameterNode> parameters, Option<TypeNode> returnType, BodyNode body)
+    private RoutineDeclarationNode(IdentifierToken identifier, IEnumerable<ParameterNode> parameters, Option<TypeNode> returnType,
+      BodyNode body, SymT symT)
     {
       Identifier = identifier;
       Parameters = parameters.ToImmutableArray();
       ReturnType = returnType;
       Body = body;
+      SymbolTable = symT;
     }
 
     private RoutineDeclarationNode()
     {
     }
 
-    public static Either<ParseException, Pair<List<IToken>,RoutineDeclarationNode>> Parse(List<IToken> tokens)
+    public static Either<ParseException, Pair<List<IToken>,RoutineDeclarationNode>> Parse(List<IToken> tokens, SymT symT)
     {
+      var NewSymT = new SymT(symT); 
+      
       Console.WriteLine("RoutineDeclarationNode");
       if (tokens.Count <= 3)
         return NotARoutineException;
@@ -59,7 +64,7 @@ namespace ILangCompiler.Parser.AST.Declarations
       var parameters = new List<ParameterNode>();
       while (true)
       {
-        var maybeParameter = ParameterNode.Parse(tokens);
+        var maybeParameter = ParameterNode.Parse(tokens, NewSymT);
 
         if (maybeParameter.IsLeft)
         {
@@ -96,7 +101,7 @@ namespace ILangCompiler.Parser.AST.Declarations
       if (tokens[0] is ColonSymbolToken)
       {
         tokens = tokens.Skip(1).ToList();
-        maybeType = TypeNode.Parse(tokens);
+        maybeType = TypeNode.Parse(tokens, symT);
         if (maybeType.IsLeft)
           return NotARoutineException;
         tokens = maybeType.RightToList()[0].First;
@@ -111,7 +116,7 @@ namespace ILangCompiler.Parser.AST.Declarations
 
       tokens = tokens.Skip(1).ToList();
 
-      var maybeBody = BodyNode.Parse(tokens);
+      var maybeBody = BodyNode.Parse(tokens, NewSymT);
       if (maybeBody.IsLeft)
       {
         return maybeBody.LeftToList()[0];
@@ -134,10 +139,19 @@ namespace ILangCompiler.Parser.AST.Declarations
             tokens[0] is SemicolonSymbolToken)
           tokens = tokens.Skip(1).ToList();
         else break;
-      
+
+      if (symT.Contain(identifier))
+      {
+        Console.WriteLine("Repeating identifier in the same scope");
+      }
+      else
+      {
+        symT.Add(identifier);
+      }
+
       return new Pair<List<IToken>, RoutineDeclarationNode>(tokens, new RoutineDeclarationNode(
         identifier, parameters, maybeType.Map<TypeNode>(pr => pr.Second).ToOption(),
-        maybeBody.RightToList()[0].Second));
+        maybeBody.RightToList()[0].Second, NewSymT));
     
     }
   }

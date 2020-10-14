@@ -35,7 +35,7 @@ namespace ILangCompiler.Parser.AST.Statements
         }
         private static ParseException NotAStatementException => new ParseException("Not a statement");
 
-        public static Either<ParseException, Pair<List<IToken>,StatementNode>> Parse(List<IToken> tokens)
+        public static Either<ParseException, Pair<List<IToken>,StatementNode>> Parse(List<IToken> tokens, SymT symT)
         {
             Console.WriteLine("StatementNode");
             var maybeAssignment = AssignmentNode.Parse(tokens);
@@ -46,7 +46,7 @@ namespace ILangCompiler.Parser.AST.Statements
                     maybeAssignment.RightToList()[0].Second));
             }
 
-            var maybeRoutineCall = RoutineCallNode.Parse(tokens);
+            var maybeRoutineCall = RoutineCallNode.Parse(tokens, symT);
             if (maybeRoutineCall.IsRight)
             {
                 tokens = maybeRoutineCall.RightToList()[0].First;
@@ -54,7 +54,7 @@ namespace ILangCompiler.Parser.AST.Statements
                     maybeRoutineCall.RightToList()[0].Second));
             }
 
-            var maybeWhileLoop = WhileLoopNode.Parse(tokens);
+            var maybeWhileLoop = WhileLoopNode.Parse(tokens, symT);
             if (maybeWhileLoop.IsRight)
             {
                 tokens = maybeWhileLoop.RightToList()[0].First;
@@ -62,7 +62,7 @@ namespace ILangCompiler.Parser.AST.Statements
                     maybeWhileLoop.RightToList()[0].Second));
             }
 
-            var maybeForLoop = ForLoopNode.Parse(tokens);
+            var maybeForLoop = ForLoopNode.Parse(tokens, symT);
             if (maybeForLoop.IsRight)
             {
                 tokens = maybeForLoop.RightToList()[0].First;
@@ -70,7 +70,7 @@ namespace ILangCompiler.Parser.AST.Statements
                     maybeWhileLoop.RightToList()[0].Second));
             }
                 
-            var maybeIfStatement = IfStatementNode.Parse(tokens);
+            var maybeIfStatement = IfStatementNode.Parse(tokens, symT);
             if (maybeIfStatement.IsRight)
             {
                 tokens = maybeIfStatement.RightToList()[0].First;

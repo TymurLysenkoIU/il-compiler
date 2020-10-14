@@ -6,6 +6,7 @@ using ILangCompiler.Scanner.Tokens;
 using ILangCompiler.Scanner.Tokens.Predefined.Keywords.Declaration;
 using ILangCompiler.Scanner.Tokens.Predefined.Symbols;
 using LanguageExt;
+using LanguageExt.ClassInstances.Pred;
 
 namespace ILangCompiler.Parser.AST.Declarations.Types
 {
@@ -21,7 +22,7 @@ namespace ILangCompiler.Parser.AST.Declarations.Types
 
         private static ParseException NotATypeDeclarationException => new ParseException("Not a type declaration");
 
-        public static Either<ParseException, Pair<List<IToken>,TypeDeclarationNode>> Parse(List<IToken> tokens)
+        public static Either<ParseException, Pair<List<IToken>,TypeDeclarationNode>> Parse(List<IToken> tokens, SymT symT)
         {
             Console.WriteLine("TypeDeclarationNode");
             if (tokens.Count < 3)
@@ -35,7 +36,7 @@ namespace ILangCompiler.Parser.AST.Declarations.Types
             IdentifierToken identifier = (IdentifierToken) tokens[1];
             tokens = tokens.Skip(3).ToList();
 
-            var maybeType = TypeNode.Parse(tokens);
+            var maybeType = TypeNode.Parse(tokens, symT);
             if (maybeType.IsLeft)
                 return maybeType.LeftToList()[0];
             tokens = maybeType.RightToList()[0].First;
@@ -45,6 +46,14 @@ namespace ILangCompiler.Parser.AST.Declarations.Types
                     tokens = tokens.Skip(1).ToList();
                 else break;
             
+            if (symT.Contain(identifier))
+            {
+                Console.WriteLine("Repeating identifier in the same scope");
+            }
+            else
+            {
+                symT.Add(identifier);
+            }
             return new Pair<List<IToken>, TypeDeclarationNode>(tokens, new TypeDeclarationNode(
                 identifier, maybeType.RightToList()[0].Second));
         }

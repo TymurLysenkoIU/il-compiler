@@ -16,12 +16,14 @@ namespace ILangCompiler.Parser.AST.Declarations.Types
         private static ParseException NotARecordTypeException => new ParseException("Not a record type");
 
         public List<VariableDeclarationNode> VariableDeclarations;
-        private RecordTypeNode(List<VariableDeclarationNode> var_decl_nodes)
+        public SymT SymbolTable;
+        private RecordTypeNode(List<VariableDeclarationNode> varDeclNodes, SymT symT)
         {
-            VariableDeclarations = var_decl_nodes;
+            VariableDeclarations = varDeclNodes;
+            SymbolTable = symT;
         }
 
-        public static Either<ParseException, Pair<List<IToken>, RecordTypeNode>> Parse(List<IToken> tokens)
+        public static Either<ParseException, Pair<List<IToken>, RecordTypeNode>> Parse(List<IToken> tokens, SymT symT)
         {
             Console.WriteLine("RecordTypeNode");
             var declarations = new List<VariableDeclarationNode>();
@@ -37,7 +39,7 @@ namespace ILangCompiler.Parser.AST.Declarations.Types
             
             while (true)
             {
-                var maybeVariableDeclaration = VariableDeclarationNode.Parse(tokens);
+                var maybeVariableDeclaration = VariableDeclarationNode.Parse(tokens, symT);
                 if (maybeVariableDeclaration.IsLeft)
                     break;
                 declarations.Add(maybeVariableDeclaration.RightToList()[0].Second);
@@ -55,7 +57,7 @@ namespace ILangCompiler.Parser.AST.Declarations.Types
                     tokens = tokens.Skip(1).ToList();
                 else break;
             
-            return new Pair<List<IToken>, RecordTypeNode>(tokens, new RecordTypeNode(declarations));
+            return new Pair<List<IToken>, RecordTypeNode>(tokens, new RecordTypeNode(declarations, symT));
 
         }
 
