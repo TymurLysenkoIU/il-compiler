@@ -42,10 +42,6 @@ namespace ILangCompiler
         using var fileReader = new SafeStreamReader(options.FilePath, Encoding.UTF8);
         var tokens = Lexer.Tokenize(fileReader).ToList();
 
-        //var tokens_copy = tokens.ToList();
-        //var parsers = ProgramNode.Parse(tokens_copy);
-        //Console.WriteLine(parsers.ToString());
-
 
         // TODO: add additional cli arguments to indicate the compilation result
         // TODO: add additional cli arguments to indicate the output file
@@ -86,10 +82,13 @@ namespace ILangCompiler
           }
         }
 
-        var ast = ProgramNode.Parse(tokens);
-
         resultEffect =
-          FConsole.WriteLine(tokensString.ToString());
+          FConsole.WriteLine(tokensString.ToString() + "\n\n");
+        
+        var tokens_copy = tokens.ToList();
+        var parsers = ProgramNode.Parse(tokens_copy);
+        Console.WriteLine(parsers.ToString());
+        
       }
       else
       {

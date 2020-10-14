@@ -25,7 +25,7 @@ namespace ILangCompiler.Parser.AST.Statements
             SymbolTable = symT;
         }
         private static ParseException NotAForLoopException => new ParseException("Not a for loop");
-
+        private static ParseException RepeatedIdentifierException => new ParseException("Repeating identifier in the same scope");
         public static Either<ParseException, Pair<List<IToken>,ForLoopNode>> Parse(List<IToken> tokens, SymT symT)
         {
             Console.WriteLine("ForLoopNode");
@@ -46,7 +46,9 @@ namespace ILangCompiler.Parser.AST.Statements
 
             if (NewSymT.Contain(identifier))
             {
-                Console.WriteLine("Repeating identifier in the same scope");
+                
+                Console.Write("    Error : Repeating identifier in the same scope\n");
+                return RepeatedIdentifierException;
             }
             else
             {

@@ -17,7 +17,7 @@ namespace ILangCompiler.Parser.AST.Declarations.Types
         public Option<ExpressionNode> Expression;
         
         private static ParseException NotAVariableDeclarationException => new ParseException("Not a variable declaration");
-
+        private static ParseException RepeatedIdentifierException => new ParseException("Repeating identifier in the same scope");
         private VariableDeclarationNode(IdentifierToken identifier, Option<TypeNode> type, Option<ExpressionNode> expression)
         {
             Identifier = identifier;
@@ -63,7 +63,8 @@ namespace ILangCompiler.Parser.AST.Declarations.Types
                 
                 if (symT.Contain(identifier))
                 {
-                    Console.WriteLine("Repeating identifier in the same scope");
+                    Console.Write("    Error : Repeating identifier in the same scope\n");
+                    return RepeatedIdentifierException;
                 }
                 else
                 {

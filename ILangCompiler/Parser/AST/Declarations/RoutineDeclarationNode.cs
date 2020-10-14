@@ -23,7 +23,7 @@ namespace ILangCompiler.Parser.AST.Declarations
     public SymT SymbolTable;
 
     private static ParseException NotARoutineException => new ParseException("Not a routine");
-
+    private static ParseException RepeatedIdentifierException => new ParseException("Repeating identifier in the same scope");
     private RoutineDeclarationNode(IdentifierToken identifier, IEnumerable<ParameterNode> parameters, Option<TypeNode> returnType,
       BodyNode body, SymT symT)
     {
@@ -142,7 +142,7 @@ namespace ILangCompiler.Parser.AST.Declarations
 
       if (symT.Contain(identifier))
       {
-        Console.WriteLine("Repeating identifier in the same scope");
+        return RepeatedIdentifierException;
       }
       else
       {

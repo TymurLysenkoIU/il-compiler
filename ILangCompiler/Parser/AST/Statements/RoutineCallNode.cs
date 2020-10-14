@@ -19,6 +19,7 @@ namespace ILangCompiler.Parser.AST.Statements
             Expressions = expressions;
         }
         private static ParseException NotARoutineCallException => new ParseException("Not a routine call");
+        private static ParseException RoutineDoesNotExist => new ParseException("Such routine does not exist");
 
         public static Either<ParseException, Pair<List<IToken>,RoutineCallNode>> Parse(List<IToken> tokens, SymT symT)
         {
@@ -79,7 +80,8 @@ namespace ILangCompiler.Parser.AST.Statements
 
             if (!(symT.ContainRec(identifier)))
             {
-                Console.Write("Such routine does not exist");
+                Console.Write("    Error : Such routine does not exist\n");
+                return RoutineDoesNotExist;
             }
 
             return new Pair<List<IToken>,RoutineCallNode> (tokens, new RoutineCallNode(

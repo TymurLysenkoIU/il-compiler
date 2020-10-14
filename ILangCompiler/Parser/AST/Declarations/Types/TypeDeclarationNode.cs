@@ -21,7 +21,7 @@ namespace ILangCompiler.Parser.AST.Declarations.Types
         }
 
         private static ParseException NotATypeDeclarationException => new ParseException("Not a type declaration");
-
+        private static ParseException RepeatedIdentifierException => new ParseException("Repeating identifier in the same scope");
         public static Either<ParseException, Pair<List<IToken>,TypeDeclarationNode>> Parse(List<IToken> tokens, SymT symT)
         {
             Console.WriteLine("TypeDeclarationNode");
@@ -48,7 +48,7 @@ namespace ILangCompiler.Parser.AST.Declarations.Types
             
             if (symT.Contain(identifier))
             {
-                Console.WriteLine("Repeating identifier in the same scope");
+                return RepeatedIdentifierException;
             }
             else
             {

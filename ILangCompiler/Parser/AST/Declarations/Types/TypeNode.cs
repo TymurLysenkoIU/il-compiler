@@ -32,7 +32,7 @@ namespace ILangCompiler.Parser.AST.Declarations.Types
         }
 
         private static ParseException NotATypeException => new ParseException("Not a type");
-
+        private static ParseException NoSuchIdentifier => new ParseException("Identifier does not exist");
         
         public static Either<ParseException, Pair<List<IToken>, TypeNode>> Parse(List<IToken> tokens, SymT symT)
         {
@@ -54,7 +54,7 @@ namespace ILangCompiler.Parser.AST.Declarations.Types
                         IdentifierToken identifier = (IdentifierToken) tokens[0];
                         if (!(symT.ContainRec(identifier)))
                         {
-                            Console.Write("No such identifier");
+                            return NoSuchIdentifier;
                         }
                         tokens = tokens.Skip(1).ToList();
                         return new Pair<List<IToken>, TypeNode> (tokens, new TypeNode(identifier));
